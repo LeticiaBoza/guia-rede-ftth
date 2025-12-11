@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Completo de Rede FTTH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .main-container {
+            display: flex;
+        }
+        .sidebar {
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: #fff;
+            padding: 2rem 1rem;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            z-index: 20;
+        }
+        .sidebar h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sidebar nav a {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #475569;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar nav a:hover {
+            background-color: #f1f5f9;
+            color: #312e81;
+        }
+        .content-area {
+            margin-left: 240px;
+            width: calc(100% - 240px);
+        }
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        .stage {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px_6px_-1px_rgb(0,0,0,0.1),_0_2px_4px_-2px_rgb(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        .stage-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .component-grid, .step-grid, .glossary-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .component {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .component-icon {
+            flex-shrink: 0;
+            width: 3.5rem;
+            height: 3.5rem;
+            background-color: #e0e7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px #4f46e5;
+            transition: transform 0.2s;
+        }
+        .component:hover .component-icon {
+            transform: scale(1.1);
+        }
+        .component-icon svg {
+            width: 1.75rem;
+            height: 1.75rem;
+            color: #4f46e5;
+        }
+        .component-info {
+            text-align: left;
+            flex-grow: 1;
+        }
+        .component-title {
+            font-weight: 600;
+            color: #312e81;
+        }
+        .component-desc {
+            font-size: 0.875rem;
+            color: #475569;
+            margin-top: 0.25rem;
+        }
+        .tech-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .tech-icon {
+            width: 2rem;
+            height: 2rem;
+            background-color: #f0f4f8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .tech-icon svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #64748b;
+        }
+        .connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: -0.5rem 0;
+            position: relative;
+        }
+        .connector-line {
+            width: 2px;
+            height: 3rem;
+            background-color: #cbd5e1;
+        }
+        .connector-label {
+            position: absolute;
+            background-color: #f1f5f9;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .tooltip {
+            visibility: hidden;
+            width: 240px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -120px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .tooltip.right {
+            left: 110%;
+            bottom: 50%;
+            transform: translateY(50%);
+            margin-left: 0;
+        }
+        .tooltip.right::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent #1e293b transparent transparent;
+        }
+        .tech-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .step-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            align-items: stretch;
+        }
+        .step-card {
+            border-left-width: 4px;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .step-card h3 {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .step-card .step-number {
+            background-color: #e2e8f0;
+            color: #475569;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+        .step-card p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #475569;
+            flex-grow: 1;
+        }
+        .step-arrow {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            color: #94a3b8;
+        }
+        .card-central { border-color: #60a5fa; }
+        .card-externa { border-color: #4ade80; }
+        .card-cliente { border-color: #facc15; }
+        .glossary-grid {
+            grid-template-columns: 1fr;
+        }
+        .glossary-item dt {
+            font-weight: 600;
+            color: #312e81;
+        }
+        .glossary-item dd {
+            font-size: 0.875rem;
+            color: #475569;
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                box-shadow: none;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .content-area {
+                margin-left: 0;
+                width: 100%;
+            }
+            .flow-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="p-0">
+
+<div class="main-container">
+    <aside class="sidebar">
+        <h1>Guia FTTH</h1>
+        <nav>
+            <a href="#diagrama-rede">Diagrama da Rede</a>
+            <a href="#processo-detalhado">Processo Detalhado</a>
+            <a href="#glossario">Glossário</a>
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <div class="flow-container">
+            <div id="diagrama-rede" class="stage">
+                <h2 class="stage-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Diagrama de Componentes da Rede
+                </h2>
+                <div class="component-grid">
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 00-.12-1.03l-2.268-9.64a3.375 3.375 0 00-3.285-2.602H7.923a3.375 3.375 0 00-3.285 2.602l-2.268 9.64a4.5 4.5 0 00-.12 1.03v.228m15.56 0a2.25 2.25 0 01-2.25 2.25h-11.11a2.25 2.25 0 01-2.25-2.25m15.56 0v-1.5a2.25 2.25 0 00-2.25-2.25H5.25a2.25 2.25 0 00-2.25 2.25v1.5" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">OLT (Optical Line Terminal)</h3>
+                            <p class="component-desc">Gera e gerencia o sinal óptico para toda a rede.</p>
+                        </div>
+                        <div class="tech-info">
+                            <div class="tech-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" /></svg>
+                                <div class="tooltip right"><b>WDM:</b> A OLT envia o sinal de Download (Downstream) em 1490nm e recebe o de Upload (Upstream) em 1310nm.</div>
+                            </div>
+                            <div class="tech-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+                                <div class="tooltip right"><b>Potência Óptica:</b> A OLT emite um sinal forte, tipicamente entre +3 a +7 dBm.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connector"><div class="connector-line"></div><div class="connector-label">Cordão Óptico</div></div>
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5v7.5h-7.5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 110-18 9 9 0 010 18z" /><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9v6m16.5-6v6" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">DIO (Distribuidor Interno Óptico)</h3>
+                            <p class="component-desc">Painel que conecta a rede interna com os cabos da rua.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage">
+                <div class="component-grid">
+                     <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">CEO (Caixa de Emenda Óptica)</h3>
+                            <p class="component-desc">Protege fusões e abriga o 1º splitter (divisor).</p>
+                        </div>
+                    </div>
+                    <div class="connector"><div class="connector-line"></div><div class="connector-label">Cabo de Distribuição</div></div>
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">CTO (Caixa de Terminação Óptica)</h3>
+                            <p class="component-desc">Caixa no poste com o 2º splitter para conectar os clientes.</p>
+                        </div>
+                        <div class="tech-info">
+                            <div class="tech-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+                                <div class="tooltip right"><b>Potência Óptica:</b> Após passar por splitters e pela distância, o sinal na CTO é mais fraco. O técnico mede aqui para garantir que está dentro do nível aceitável para a instalação.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage">
+                <div class="component-grid">
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h13.5m-13.5 7.5h13.5m-1.5-15l-1.5 18" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">Cabo Drop + Fast Connector</h3>
+                            <p class="component-desc">Cabo que sai da CTO e é conectorizado na ponta.</p>
+                        </div>
+                    </div>
+                    <div class="connector"><div class="connector-line"></div></div>
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">PTO (Ponto de Terminação Óptica)</h3>
+                            <p class="component-desc">Caixa na parede (roseta) que organiza a chegada da fibra.</p>
+                        </div>
+                    </div>
+                    <div class="connector"><div class="connector-line"></div><div class="connector-label">Cordão Óptico Interno</div></div>
+                    <div class="component">
+                        <div class="component-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.136 12.006a8.25 8.25 0 0113.728 0M2.023 8.92a11.25 11.25 0 0119.954 0M12 21.75a.75.75 0 01-.75-.75V18a.75.75 0 011.5 0v3a.75.75 0 01-.75.75z" /></svg></div>
+                        <div class="component-info">
+                            <h3 class="component-title">ONU (Optical Network Unit)</h3>
+                            <p class="component-desc">Equipamento final que converte a luz em sinal de Internet.</p>
+                        </div>
+                        <div class="tech-info">
+                            <div class="tech-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div class="tooltip right"><b>Potência Óptica:</b> A ONU precisa receber um sinal dentro da faixa ideal (ex: -8 a -25 dBm) para funcionar. A luz "PON" ou "LOS" na ONU indica a qualidade desse sinal.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="processo-detalhado" class="stage">
+                <h2 class="stage-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                    Processo Detalhado Passo a Passo
+                </h2>
+                <div class="step-grid">
+                    <div class="step-card card-central"><h3><span class="step-number">1</span>Saída da Central</h3><p>O processo começa na OLT, de onde o sinal sai e é conectado via cordão óptico a um DIO.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-central"><h3><span class="step-number">2</span>Dentro do DIO</h3><p>Dentro do DIO, um pigtail é fundido à fibra do cabo óptico que vai para a rua, permitindo manobras.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-externa"><h3><span class="step-number">3</span>O Cabo na Rua</h3><p>O cabo óptico, contendo várias fibras, vai para a rua, protegido em caixas herméticas contra umidade.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-externa"><h3><span class="step-number">4</span>Caixa de Emenda (CEO)</h3><p>A CEO protege fusões e abriga o splitter de 1º nível, que divide o sinal da PON para as CTOs.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-externa"><h3><span class="step-number">5</span>Caixa de Terminação (CTO)</h3><p>A caixa no poste com o splitter de 2º nível, já conectorizado, aguarda a conexão do cliente.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-cliente"><h3><span class="step-number">6</span>Ativação do Cliente</h3><p>Um cabo drop é conectado na CTO e na outra ponta é montado um Fast Connector para a casa do cliente.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-cliente"><h3><span class="step-number">7</span>Chegada da Fibra</h3><p>O cabo drop conecta-se na ONU ou em uma PTO (Ponto de Terminação Óptica) para melhor acabamento.</p><div class="step-arrow"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div>
+                    <div class="step-card card-cliente"><h3><span class="step-number">8</span>O Ponto Final: ONU</h3><p>A ONU, equipamento final, converte o sinal de fibra em rede Ethernet e/ou Wi-Fi para os dispositivos.</p></div>
+                </div>
+            </div>
+
+            <div id="glossario" class="stage">
+                <h2 class="stage-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    Glossário de Termos
+                </h2>
+                <dl class="glossary-grid">
+                    <div class="glossary-item"><dt>OLT (Optical Line Terminal)</dt><dd>Equipamento na central do provedor que gera e controla o sinal da rede de fibra.</dd></div>
+                    <div class="glossary-item"><dt>DIO (Distribuidor Interno Óptico)</dt><dd>Painel que organiza e conecta os cabos internos da central com os cabos externos.</dd></div>
+                    <div class="glossary-item"><dt>Pigtail</dt><dd>Pedaço de fibra com um conector em apenas uma ponta, usado para fusão dentro do DIO.</dd></div>
+                    <div class="glossary-item"><dt>CEO (Caixa de Emenda Óptica)</dt><dd>Caixa hermética na rua que protege as fusões de fibra e geralmente abriga o primeiro splitter.</dd></div>
+                    <div class="glossary-item"><dt>Splitter</dt><dd>Componente passivo que divide um sinal óptico em vários, permitindo que uma fibra atenda múltiplos clientes.</dd></div>
+                    <div class="glossary-item"><dt>CTO (Caixa de Terminação Óptica)</dt><dd>Caixa de acesso no poste ou fachada onde os cabos dos clientes são conectados à rede.</dd></div>
+                    <div class="glossary-item"><dt>Cabo Drop</dt><dd>O cabo de fibra óptica final que vai da CTO até a casa do cliente.</dd></div>
+                    <div class="glossary-item"><dt>Fast Connector</dt><dd>Conector de montagem rápida instalado na ponta do cabo drop, sem necessidade de fusão.</dd></div>
+                    <div class="glossary-item"><dt>PTO (Ponto de Terminação Óptica)</dt><dd>Uma "tomada" de fibra na parede da casa do cliente, para melhor organização e acabamento.</dd></div>
+                    <div class="glossary-item"><dt>ONU (Optical Network Unit)</dt><dd>Equipamento na casa do cliente que converte o sinal de luz da fibra em sinal de internet (Ethernet/Wi-Fi).</dd></div>
+                    <div class="glossary-item"><dt>WDM (Wavelength Division Multiplexing)</dt><dd>Tecnologia que usa diferentes comprimentos de onda (cores) de luz para enviar download e upload na mesma fibra.</dd></div>
+                    <div class="glossary-item"><dt>Potência Óptica (dBm)</dt><dd>A medida da força do sinal de luz. O sinal enfraquece ao longo do caminho e precisa estar em um nível ideal na ONU.</dd></div>
+                </dl>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Script to fix smooth scrolling for sidebar navigation
+    document.querySelectorAll('.sidebar nav a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
