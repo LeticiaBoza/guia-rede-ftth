@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Orçamento de Potência - Guia FTTH</title>
+    <meta name="description" content="Simule a atenuação óptica da fibra e calcule a potência de sinal recebida pela ONU do cliente final com a Calculadora de Orçamento de Potência (Power Budget).">
+    <!-- Script de tema síncrono para evitar flash de luz -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col lg:flex-row antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg">F</div>
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Guia FTTH</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Alternar Tema">
+                <svg id="moon-icon-mobile" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon-mobile" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+            <button id="menu-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Abrir Menu">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden transition-all duration-300">
+        <div class="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 p-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <span class="font-extrabold text-xl tracking-wider text-brand-600 dark:text-brand-400">NAVEGAÇÃO</span>
+                    <button id="menu-close" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Início</span>
+                    </a>
+                    <a href="componentes.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Componentes da Rede</span>
+                    </a>
+                    <a href="jornada.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Jornada & Simulador</span>
+                    </a>
+                    <a href="calculadora.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-brand-600 bg-brand-50/50 dark:bg-slate-800/50 dark:text-white transition-all">
+                        <span>Calculadora</span>
+                    </a>
+                    <a href="tecnologias.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Tecnologias PON & Ferramentas</span>
+                    </a>
+                    <a href="glossario.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Glossário</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-400">
+                Guia Completo FTTH v2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex w-72 h-screen flex-col justify-between p-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 z-30">
+        <div class="space-y-8">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">F</div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">Guia de Rede FTTH</h1>
+                    <span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Tudo sobre Fibra</span>
+                </div>
+            </a>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Início
+                </a>
+                <a href="componentes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Componentes da Rede
+                </a>
+                <a href="jornada.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Jornada & Simulador
+                </a>
+                <a href="calculadora.html" class="sidebar-link active bg-slate-100 text-brand-600 dark:bg-slate-800/80 dark:text-white flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculadora Orçamento
+                </a>
+                <a href="tecnologias.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Tecnologias PON & Ferramentas
+                </a>
+                <a href="glossario.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Glossário Geral
+                </a>
+            </nav>
+        </div>
+
+        <!-- Theme Toggle and Info Footer -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-900">
+                <span class="text-xs font-semibold text-slate-500">Alternar Tema</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all focus:outline-none" aria-label="Alternar Tema">
+                    <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                </button>
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-600 text-center font-medium">
+                Guia Técnico de Fibra Óptica • 2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 lg:pl-80 min-h-screen space-y-12">
+        
+        <!-- Section: Interactive Power Budget Calculator -->
+        <section id="calculadora" class="space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                    <span class="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    </span>
+                    Calculadora de Orçamento de Potência (Power Budget)
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Mude os parâmetros da rede para simular a atenuação da fibra óptica e o sinal que chega na ONU do cliente.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Inputs Section (2 Columns) -->
+                <div class="lg:col-span-2 glass-card rounded-3xl p-6 md:p-8 space-y-6 shadow-md border border-slate-200 dark:border-slate-800">
+                    <h3 class="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Configurar Parâmetros de Rede</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- OLT TX Power Slider -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <label for="input-olt-tx">Potência de Saída da OLT</label>
+                                <span class="text-brand-600 dark:text-brand-400" id="val-olt-tx">+3.0 dBm</span>
+                            </div>
+                            <input type="range" id="input-olt-tx" min="0" max="10" step="0.5" value="3" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <span class="text-[10px] text-slate-400 block">Valores comuns no mercado: +3 a +7 dBm.</span>
+                        </div>
+
+                        <!-- Distance Slider -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <label for="input-distance">Distância da Fibra (Caminho)</label>
+                                <span class="text-brand-600 dark:text-brand-400" id="val-distance">5.0 km</span>
+                            </div>
+                            <input type="range" id="input-distance" min="0" max="25" step="0.5" value="5" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <span class="text-[10px] text-slate-400 block">Atenuação típica de 0.35 dB por km (em 1490nm).</span>
+                        </div>
+
+                        <!-- Splitter 1 Dropdown -->
+                        <div class="space-y-2">
+                            <label for="select-splitter-1" class="text-sm font-semibold block">Divisão 1 (CEO / Emenda)</label>
+                            <select id="select-splitter-1" class="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500">
+                                <option value="0">Nenhum (0 dB)</option>
+                                <option value="3.5">Splitter 1:2 (~3.5 dB)</option>
+                                <option value="7.2">Splitter 1:4 (~7.2 dB)</option>
+                                <option value="10.5" selected>Splitter 1:8 (~10.5 dB)</option>
+                                <option value="14.1">Splitter 1:16 (~14.1 dB)</option>
+                            </select>
+                        </div>
+
+                        <!-- Splitter 2 Dropdown -->
+                        <div class="space-y-2">
+                            <label for="select-splitter-2" class="text-sm font-semibold block">Divisão 2 (CTO / Rua)</label>
+                            <select id="select-splitter-2" class="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500">
+                                <option value="0">Nenhum (0 dB)</option>
+                                <option value="3.5">Splitter 1:2 (~3.5 dB)</option>
+                                <option value="7.2">Splitter 1:4 (~7.2 dB)</option>
+                                <option value="10.5">Splitter 1:8 (~10.5 dB)</option>
+                                <option value="14.1" selected>Splitter 1:16 (~14.1 dB)</option>
+                                <option value="17.5">Splitter 1:32 (~17.5 dB)</option>
+                            </select>
+                        </div>
+
+                        <!-- Connectors input -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <label for="input-connectors">Conectores (Acoplamentos)</label>
+                                <span class="text-brand-600 dark:text-brand-400" id="val-connectors">4 unidades</span>
+                            </div>
+                            <input type="range" id="input-connectors" min="2" max="10" step="1" value="4" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <span class="text-[10px] text-slate-400 block">Média de perda: 0.25 dB por conector/adaptador.</span>
+                        </div>
+
+                        <!-- Splices input -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm font-semibold">
+                                <label for="input-splices">Emendas por Fusão</label>
+                                <span class="text-brand-600 dark:text-brand-400" id="val-splices">3 fusões</span>
+                            </div>
+                            <input type="range" id="input-splices" min="0" max="15" step="1" value="3" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <span class="text-[10px] text-slate-400 block">Média de perda: 0.1 dB por ponto de fusão.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Panel (1 Column) -->
+                <div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-lg border-2 border-brand-500/20 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Diagnóstico de Sinal</h3>
+                        
+                        <!-- Calculated Loss -->
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase font-bold tracking-wider block">Atenuação Total Estimada</span>
+                            <span class="text-3xl font-extrabold text-slate-800 dark:text-slate-100" id="calc-loss">0.00 dB</span>
+                        </div>
+
+                        <!-- Received Signal -->
+                        <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 relative">
+                            <span class="text-xs text-slate-400 uppercase font-bold tracking-wider block">Sinal Recebido na ONU</span>
+                            <span class="text-4xl font-black block mt-1 tracking-tight" id="calc-rx">-0.00 dBm</span>
+                            <!-- Status indicator badge -->
+                            <span id="badge-status" class="inline-flex items-center gap-1.5 px-3 py-1 mt-3 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                SINAL EXCELENTE
+                            </span>
+                        </div>
+
+                        <!-- Signal Indicator Bar -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-400">
+                                <span>Sobrecarga (&gt;-8)</span>
+                                <span>Ideal (-15 a -25)</span>
+                                <span>Sem Sinal (&lt;-28)</span>
+                            </div>
+                            <div class="w-full h-3 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 via-emerald-500 via-yellow-400 to-red-500 relative">
+                                <!-- Indicator marker pointer -->
+                                <div id="indicator-marker" class="absolute top-1/2 -translate-y-1/2 -ml-2.5 w-5 h-5 bg-white border-2 border-slate-800 rounded-full shadow-md transition-all duration-300 left-[50%] flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-600"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explanatory note -->
+                    <p id="feedback-text" class="text-xs text-slate-500 dark:text-slate-400 mt-6 leading-relaxed bg-slate-100 dark:bg-slate-900/40 p-3 rounded-xl">
+                        A potência óptica está dentro da faixa ideal. A ONU irá conectar sem perdas de pacotes e com excelente estabilidade.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cenários Reais e Exemplos Práticos de Projeto -->
+            <div class="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364.364l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </span>
+                    <h3 class="text-lg font-bold">Cenários Reais e Casos Práticos de Projeto</h3>
+                </div>
+                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">Carregue cenários reais de engenharia de rede diretamente no simulador e veja como as decisões de projeto impactam o sinal.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Scenario 1 -->
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-brand-500/30 transition-all animate-fade-in">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded">Urbano Comum</span>
+                                <span class="text-[10px] text-slate-400 font-medium">GPON 1:64</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Cliente Urbano Padrão</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Cenário típico de uma cidade. Distância curta (1.5 km), splitter de primeiro nível (1:8) na caixa do poste e splitter de segundo nível (1:8) na caixa terminal de atendimento.</p>
+                        </div>
+                        <button onclick="loadPreset(3.0, 1.5, 10.5, 10.5, 4, 2)" class="w-full py-2 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all mt-2">Carregar Cenário</button>
+                    </div>
+
+                    <!-- Scenario 2 -->
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-brand-500/30 transition-all animate-fade-in">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded">Rural Distante</span>
+                                <span class="text-[10px] text-slate-400 font-medium">GPON 1:32</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Cliente Rural de Longo Alcance</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Fibra que viaja 12 km para atender chácaras. Para compensar a perda no cabo longo, usa-se apenas um splitter (1:32) e OLT com potência de saída mais forte (+5 dBm).</p>
+                        </div>
+                        <button onclick="loadPreset(5.0, 12.0, 0, 17.5, 5, 8)" class="w-full py-2 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all mt-2">Carregar Cenário</button>
+                    </div>
+
+                    <!-- Scenario 3 -->
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-brand-500/30 transition-all animate-fade-in">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded">Prédio / Condomínio</span>
+                                <span class="text-[10px] text-slate-400 font-medium">GPON 1:32</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Condomínio Vertical Integrado</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Distância extremamente curta (500m), mas possui alta quantidade de acopladores/conectores (6) por passar por caixas de passagem nos andares, com divisão de 1:2 e 1:16.</p>
+                        </div>
+                        <button onclick="loadPreset(3.0, 0.5, 3.5, 14.1, 6, 1)" class="w-full py-2 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all mt-2">Carregar Cenário</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Power Budget Calculator Logic
+        const oltTxInput = document.getElementById('input-olt-tx');
+        const distanceInput = document.getElementById('input-distance');
+        const splitter1Select = document.getElementById('select-splitter-1');
+        const splitter2Select = document.getElementById('select-splitter-2');
+        const connectorsInput = document.getElementById('input-connectors');
+        const splicesInput = document.getElementById('input-splices');
+
+        // Output DOM references
+        const calcLossText = document.getElementById('calc-loss');
+        const calcRxText = document.getElementById('calc-rx');
+        const badgeStatus = document.getElementById('badge-status');
+        const feedbackText = document.getElementById('feedback-text');
+        const indicatorMarker = document.getElementById('indicator-marker');
+
+        function calculatePowerBudget() {
+            const oltTx = parseFloat(oltTxInput.value);
+            const distance = parseFloat(distanceInput.value);
+            const splitter1 = parseFloat(splitter1Select.value);
+            const splitter2 = parseFloat(splitter2Select.value);
+            const connectors = parseInt(connectorsInput.value);
+            const splices = parseInt(splicesInput.value);
+
+            // Update visible label values
+            document.getElementById('val-olt-tx').innerText = (oltTx >= 0 ? '+' : '') + oltTx.toFixed(1) + " dBm";
+            document.getElementById('val-distance').innerText = distance.toFixed(1) + " km";
+            document.getElementById('val-connectors').innerText = connectors + " unidades";
+            document.getElementById('val-splices').innerText = splices + " fusões";
+
+            // Loss constants
+            const fiberLossPerKm = 0.35; // typical attenuation in dB/km at 1490nm (downstream)
+            const connectorLossVal = 0.25; // standard max connector insertion loss in dB
+            const spliceLossVal = 0.10; // standard maximum splice insertion loss in dB
+
+            // Sum losses
+            const totalFiberLoss = distance * fiberLossPerKm;
+            const totalConnectorLoss = connectors * connectorLossVal;
+            const totalSpliceLoss = splices * spliceLossVal;
+            
+            const totalLoss = totalFiberLoss + splitter1 + splitter2 + totalConnectorLoss + totalSpliceLoss;
+            const rxPower = oltTx - totalLoss;
+
+            // Update UI outputs
+            calcLossText.innerText = totalLoss.toFixed(2) + " dB";
+            calcRxText.innerText = rxPower.toFixed(2) + " dBm";
+
+            // Determine status and set color classes
+            let status = "";
+            let textFeedback = "";
+            let statusClass = "";
+
+            if (rxPower > -8.0) {
+                status = "SATURAÇÃO / FORTE";
+                statusClass = "bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30";
+                textFeedback = "Sinal extremamente forte! Há risco iminente de dano ao receptor óptico da ONU. É necessário incluir um atenuador óptico (ex: 5dB ou 10dB) para viabilizar a conexão.";
+            } else if (rxPower >= -15.0 && rxPower <= -8.0) {
+                status = "SINAL MUITO BOM";
+                statusClass = "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-500/30";
+                textFeedback = "Sinal óptico operacional e forte. Conexão estável, embora esteja próximo ao limite superior de recepção.";
+            } else if (rxPower >= -25.0 && rxPower < -15.0) {
+                status = "SINAL EXCELENTE";
+                statusClass = "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30";
+                textFeedback = "A potência óptica está na faixa ideal (Golden Zone). A ONU funcionará com estabilidade máxima, latência mínima e sem perda de pacotes.";
+            } else if (rxPower >= -28.0 && rxPower < -25.0) {
+                status = "SINAL CRÍTICO";
+                statusClass = "bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30";
+                textFeedback = "Sinal no limiar de operação da ONU. A internet pode funcionar, mas está vulnerável a quedas de link frequentes devido a oscilações térmicas ou poeira.";
+            } else {
+                status = "SEM SINAL / INOPERANTE";
+                statusClass = "bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30";
+                textFeedback = "Atenuação excessiva. O sinal óptico chegou fraco demais (LOS acesa na ONU) ou inexistente. Limpe os conectores, verifique dobras na fibra ou remova um splitter.";
+            }
+
+            badgeStatus.innerText = status;
+            badgeStatus.className = "inline-flex items-center gap-1.5 px-3 py-1 mt-3 rounded-full text-xs font-bold " + statusClass;
+            feedbackText.innerText = textFeedback;
+
+            const maxVal = -5;
+            const minVal = -35;
+            let percent = ((rxPower - minVal) / (maxVal - minVal)) * 100;
+            
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+
+            percent = 100 - percent;
+            indicatorMarker.style.left = `${percent}%`;
+        }
+
+        // Load preset values into inputs
+        function loadPreset(oltTx, distance, splitter1, splitter2, connectors, splices) {
+            oltTxInput.value = oltTx;
+            distanceInput.value = distance;
+            splitter1Select.value = splitter1;
+            splitter2Select.value = splitter2;
+            connectorsInput.value = connectors;
+            splicesInput.value = splices;
+            calculatePowerBudget();
+        }
+
+        // Attach inputs listener events
+        oltTxInput.addEventListener('input', calculatePowerBudget);
+        distanceInput.addEventListener('input', calculatePowerBudget);
+        splitter1Select.addEventListener('change', calculatePowerBudget);
+        splitter2Select.addEventListener('change', calculatePowerBudget);
+        connectorsInput.addEventListener('input', calculatePowerBudget);
+        splicesInput.addEventListener('input', calculatePowerBudget);
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+        }
+
+        function updateThemeIcons(isDark) {
+            const moonIcon = document.getElementById('moon-icon');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIconMob = document.getElementById('moon-icon-mobile');
+            const sunIconMob = document.getElementById('sun-icon-mobile');
+
+            if (isDark) {
+                moonIcon?.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIconMob?.classList.add('hidden');
+                sunIconMob?.classList.remove('hidden');
+            } else {
+                moonIcon?.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIconMob?.classList.remove('hidden');
+                sunIconMob?.classList.add('hidden');
+            }
+        }
+
+        // Mob menu toggling
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle?.addEventListener('click', () => {
+            mobileMenu?.classList.remove('hidden');
+        });
+
+        menuClose?.addEventListener('click', () => {
+            mobileMenu?.classList.add('hidden');
+        });
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu?.classList.add('hidden');
+            }
+        });
+
+        // Initialize Theme & Page Details
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateThemeIcons(isDark);
+
+        calculatePowerBudget();
+    </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Componentes da Rede - Guia FTTH</title>
+    <meta name="description" content="A linha do tempo do caminho da luz na fibra óptica: conheça detalhadamente cada componente físico da rede FTTH, da central até a casa do cliente.">
+    <!-- Script de tema síncrono para evitar flash de luz -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col lg:flex-row antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg">F</div>
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Guia FTTH</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Alternar Tema">
+                <svg id="moon-icon-mobile" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon-mobile" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+            <button id="menu-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Abrir Menu">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden transition-all duration-300">
+        <div class="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 p-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <span class="font-extrabold text-xl tracking-wider text-brand-600 dark:text-brand-400">NAVEGAÇÃO</span>
+                    <button id="menu-close" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Início</span>
+                    </a>
+                    <a href="introducao.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Como Funciona a Fibra</span>
+                    </a>
+                    <a href="componentes.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-brand-600 bg-brand-50/50 dark:bg-slate-800/50 dark:text-white transition-all">
+                        <span>Componentes da Rede</span>
+                    </a>
+                    <a href="jornada.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Jornada & Simulador</span>
+                    </a>
+                    <a href="calculadora.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Calculadora</span>
+                    </a>
+                    <a href="tecnologias.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Tecnologias PON & Ferramentas</span>
+                    </a>
+                    <a href="glossario.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Glossário</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-400">
+                Guia Completo FTTH v2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex w-72 h-screen flex-col justify-between p-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 z-30">
+        <div class="space-y-8">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">F</div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">Guia de Rede FTTH</h1>
+                    <span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Tudo sobre Fibra</span>
+                </div>
+            </a>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Início
+                </a>
+                <a href="introducao.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Como Funciona a Fibra
+                </a>
+                <a href="componentes.html" class="sidebar-link active bg-slate-100 text-brand-600 dark:bg-slate-800/80 dark:text-white flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Componentes da Rede
+                </a>
+                <a href="jornada.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Jornada & Simulador
+                </a>
+                <a href="calculadora.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculadora Orçamento
+                </a>
+                <a href="tecnologias.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Tecnologias PON & Ferramentas
+                </a>
+                <a href="glossario.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Glossário Geral
+                </a>
+            </nav>
+        </div>
+
+        <!-- Theme Toggle and Info Footer -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-900">
+                <span class="text-xs font-semibold text-slate-500">Alternar Tema</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all focus:outline-none" aria-label="Alternar Tema">
+                    <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                </button>
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-600 text-center font-medium">
+                Guia Técnico de Fibra Óptica • 2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 lg:pl-80 min-h-screen">
+        <section id="diagrama-rede" class="space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                    <span class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-400">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </span>
+                    Linha do Tempo: Componentes Físicos da Rede
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Acompanhe a trajetória física que a luz percorre desde o provedor (central) até a sua casa. Clique em qualquer etapa para saber mais.</p>
+            </div>
+
+            <!-- Timeline Grid View -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                
+                <!-- Left: Vertical Connective Timeline (Takes 2 cols) -->
+                <div class="lg:col-span-2 space-y-6 relative pl-6 border-l-2 border-dashed border-brand-200 dark:border-brand-900 ml-4 py-2">
+                    
+                    <!-- 1. OLT -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-400 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-[10px]">1</div>
+                        <button onclick="selectComponent('olt')" id="btn-olt" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm active-component ring-2 ring-brand-500 focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">OLT (Central Office)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Origem do Sinal</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 2. Porta PON & SFP -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-400 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-[10px]">2</div>
+                        <button onclick="selectComponent('portapon')" id="btn-portapon" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Porta PON & SFP</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Transmissor do Laser</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 3. DIO -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/60 border-2 border-sky-400 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-[10px]">3</div>
+                        <button onclick="selectComponent('dio')" id="btn-dio" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">DIO (Distribuidor Óptico)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Organização Central</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 4. Splitter de 1º Nível -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-400 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-[10px]">4</div>
+                        <button onclick="selectComponent('splitter1')" id="btn-splitter1" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Splitter 1º Nível</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Divisão de Distribuição</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 5. CEO -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-400 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-[10px]">5</div>
+                        <button onclick="selectComponent('ceo')" id="btn-ceo" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">CEO (Caixa de Emenda)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Fusão e Proteção de Rua</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 6. Splitter de 2º Nível -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-400 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-[10px]">6</div>
+                        <button onclick="selectComponent('splitter2')" id="btn-splitter2" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16M12 4v16"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Splitter 2º Nível</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Divisão Terminal</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 7. CTO -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border-2 border-emerald-400 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-[10px]">7</div>
+                        <button onclick="selectComponent('cto')" id="btn-cto" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">CTO (Caixa de Atendimento)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Conexão do Assinante</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 8. DROP -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 border-2 border-amber-400 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-[10px]">8</div>
+                        <button onclick="selectComponent('drop')" id="btn-drop" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Cabo Drop & Conector</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Link de Última Milha</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 9. PTO -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 border-2 border-amber-400 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-[10px]">9</div>
+                        <button onclick="selectComponent('pto')" id="btn-pto" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">PTO (Roseta)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Terminação Residencial</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- 10. ONU -->
+                    <div class="relative">
+                        <div class="absolute -left-[35px] top-4 w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 border-2 border-amber-400 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-[10px]">10</div>
+                        <button onclick="selectComponent('onu')" id="btn-onu" class="component-card w-full text-left p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">ONU / ONT (Modem)</h4>
+                                <p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Conversor do Assinante</p>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+
+
+                <!-- Right: Detailed Tech Card (Takes 3 cols) -->
+                <div class="lg:col-span-3">
+                    <div id="detail-panel" class="glass-card rounded-3xl p-6 md:p-8 shadow-md border border-slate-200 dark:border-slate-800 sticky top-24 space-y-6 transition-all duration-300">
+                        <div class="flex items-start justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span id="detail-category" class="px-2.5 py-1 text-[10px] font-bold text-sky-600 dark:text-sky-400 bg-sky-500/10 rounded-full uppercase tracking-wider">Central</span>
+                                    <span id="detail-loc-badge" class="px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-500/10 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        <span id="detail-loc-text">Central</span>
+                                    </span>
+                                </div>
+                                <h3 id="detail-title" class="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight mt-2">OLT (Optical Line Terminal)</h3>
+                            </div>
+                            <div id="detail-icon-container" class="p-3 rounded-2xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 shrink-0">
+                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Descrição Física & Função</h4>
+                                <p id="detail-desc" class="text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Gera, controla e gerencia o sinal de luz de toda a rede de fibra óptica. É o concentrador principal de internet do provedor que se comunica com cada casa.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800/60">
+                                    <h5 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Atenuação / Potência</h5>
+                                    <p id="detail-loss" class="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-1">Emite +3 a +7 dBm</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800/60">
+                                    <h5 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Localização Física</h5>
+                                    <p id="detail-loc" class="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-1">Central Office (Central)</p>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-brand-500/10 dark:bg-brand-500/5 rounded-2xl border border-brand-500/20">
+                                <h5 class="text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    Você Sabia? (Curiosidades)
+                                </h5>
+                                <p id="detail-trivia" class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                    A OLT envia dados de download no comprimento de onda de 1490nm (luz infravermelha invisível) e recebe o upload dos clientes em 1310nm na mesma fibra física usando multiplexação WDM.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Main Logic Script -->
+    <script>
+        const componentData = {
+            olt: {
+                title: "OLT (Optical Line Terminal)",
+                category: "Central",
+                desc: "Gera, controla e gerencia o sinal de luz de toda a rede de fibra óptica. É o cérebro do provedor, contendo múltiplos chassis e placas de serviço óptico.",
+                loc: "Central Office (Central)",
+                loss: "Emite +3 a +7 dBm",
+                trivia: "A OLT envia dados de download no comprimento de onda de 1490nm (luz infravermelha invisível) e recebe o upload dos clientes em 1310nm na mesma fibra física usando multiplexação WDM.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>`,
+                themeColor: "sky"
+            },
+            portapon: {
+                title: "Porta PON & Transceptor (SFP)",
+                category: "Central",
+                desc: "É a interface física de onde sai o laser da OLT. Utiliza transceptores ópticos intercambiáveis (GBICs/SFPs de classes como B+, C+ ou C++) que definem a potência de transmissão da luz na fibra.",
+                loc: "Slots da OLT na Central",
+                loss: "Mapeia até 64 ou 128 clientes",
+                trivia: "Uma única porta PON envia o sinal para uma rede passiva (PON) compartilhada. O SFP óptico (ex: C+) emite mais potência (+7 dBm) para alcançar clientes mais distantes. A junção física da porta PON com os splitters passivos é o que chamamos de rede PON.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+                themeColor: "sky"
+            },
+            dio: {
+                title: "DIO (Distribuidor Interno Óptico)",
+                category: "Central",
+                desc: "Chassi que organiza e protege a conexão das fibras que saem da OLT com os cabos de distribuição externa. As conexões internas são feitas usando adaptadores ópticos e cordões de manobra (patch cords).",
+                loc: "Central Office (Central)",
+                loss: "Perda de ~0.2 dB por acoplamento",
+                trivia: "O DIO realiza a transição entre as fibras rígidas de rua (cabos subterrâneos/aéreos) e os delicados cordões da OLT. Ele possui bandejas internas para acomodar fusões ópticas com segurança.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>`,
+                themeColor: "sky"
+            },
+            splitter1: {
+                title: "Splitter de 1º Nível (Divisor Óptico)",
+                category: "Rede Externa",
+                desc: "Dispositivo óptico passivo (sem energia elétrica) que divide o feixe de luz principal que sai da central em várias saídas menores (geralmente 1:8 ou 1:4). Ele distribui o sinal da central para os bairros.",
+                loc: "Bandejas da CEO / Gabinete",
+                loss: "Atenuação de ~10.5 dB (no padrão 1:8)",
+                trivia: "Como o splitter divide a potência da luz igualmente entre todas as saídas, a perda é puramente física. Um divisor de 1:8 reduz o sinal óptico de entrada em aproximadamente 87.5% em cada saída (cerca de 10.5 dB de perda).",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>`,
+                themeColor: "emerald"
+            },
+            ceo: {
+                title: "CEO (Caixa de Emenda Óptica)",
+                category: "Rede Externa",
+                desc: "Caixa preta robusta e lacrada que protege as fusões de fibras e aloja os splitters de 1º nível contra água, poeira e intempéries. É instalada em postes ou caixas de passagem subterrâneas.",
+                loc: "Postes ou Bueiros",
+                loss: "Fusões perdem < 0.05 dB",
+                trivia: "A CEO é preenchida com gel ou borracha de vedação mecânica. Ela resiste a inundações severas e variações extremas de temperatura de -40°C a +65°C sem alterar o tráfego da luz.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>`,
+                themeColor: "emerald"
+            },
+            splitter2: {
+                title: "Splitter de 2º Nível (Divisor Terminal)",
+                category: "Rede Externa",
+                desc: "Dispositivo passivo localizado na caixa terminal na rua (CTO) que realiza a divisão final do sinal de luz para o atendimento direto dos clientes (geralmente divisão 1:8 ou 1:16).",
+                loc: "Interno da CTO no poste",
+                loss: "Atenuação de ~14.1 dB (no padrão 1:16)",
+                trivia: "Ao somar a divisão do 1º Nível (1:8) com a do 2º Nível (1:16), criamos uma divisão de 1:128 por porta PON (8 x 16 = 128). Todos esses 128 clientes compartilham a mesma banda da porta PON de forma concorrente!",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16M12 4v16"/></svg>`,
+                themeColor: "emerald"
+            },
+            cto: {
+                title: "CTO (Caixa de Terminação Óptica)",
+                category: "Rede Externa",
+                desc: "A caixa terminal fixada no poste que conecta a rede externa de fibra aos clientes finais. Contem adaptadores ópticos externos onde os técnicos plugam os cabos drop individuais.",
+                loc: "Postes na rua",
+                loss: "Perda de acoplamento de ~0.3 dB",
+                trivia: "A CTO foi projetada para conexão limpa e ágil: os conectores rápidos mecânicos (Fast Connectors) se encaixam nela com um simples clique. Se uma porta da CTO quebrar, o técnico faz a manobra de drop para outra porta disponível.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>`,
+                themeColor: "emerald"
+            },
+            drop: {
+                title: "Cabo Drop Óptico & Conector",
+                category: "Instalação / Cliente",
+                desc: "Cabo compacto e autossustentado com fibra do tipo BLI (Bend Insensitive), projetada para suportar fortes curvas e tração mecânica. Ele estende a rede do poste até o imóvel.",
+                loc: "Vão aéreo e conduítes",
+                loss: "Atenuação de 0.35 dB/km",
+                trivia: "A fibra BLI (G.657.A) contém um anel interno de menor índice de refração chamado 'trincheira' que reflete a luz de volta ao núcleo, prevenindo atenuações brutas devido a dobras acentuadas.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>`,
+                themeColor: "amber"
+            },
+            pto: {
+                title: "PTO (Ponto de Terminação Óptica)",
+                category: "Cliente",
+                desc: "Pequena caixa plástica (Roseta) fixada na parede que recebe o cabo drop externo de forma rígida e faz a transição para um cordão óptico (patch cord) interno superflexível até a ONU.",
+                loc: "Parede interna (Roseta)",
+                loss: "Atenua ~0.25 dB",
+                trivia: "A roseta protege a integridade da instalação externa. Caso alguém esbarre no fio ou puxe o modem óptico, o impacto danificará somente o cordão flexível interno, e não a fibra que vem do poste.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
+                themeColor: "amber"
+            },
+            onu: {
+                title: "ONU / ONT (Modem Óptico)",
+                category: "Cliente",
+                desc: "Equipamento terminal active que converte o sinal de luz infravermelha em pacotes elétricos de rede padrão (Ethernet/RJ45 e rádio Wi-Fi) para conexão dos computadores e celulares.",
+                loc: "Equipamento do Cliente",
+                loss: "Sensibilidade típica de -8 a -27 dBm",
+                trivia: "A ONU emite pulsos de upload na frequência de 1310nm usando orquestração lógica TDMA (Acesso Múltiplo por Divisão de Tempo). Cada modem pisca apenas no milionésimo de segundo autorizado pela OLT.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>`,
+                themeColor: "amber"
+            }
+        };
+
+        function selectComponent(key) {
+            const data = componentData[key];
+            if (!data) return;
+
+            // Highlight timeline card
+            document.querySelectorAll('.component-card').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-brand-500', 'active-component');
+            });
+            const selectedBtn = document.getElementById(`btn-${key}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('ring-2', 'ring-brand-500', 'active-component');
+            }
+
+            // Fill details dynamic view
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-category').innerText = data.category;
+            document.getElementById('detail-desc').innerText = data.desc;
+            document.getElementById('detail-loc').innerText = data.loc;
+            document.getElementById('detail-loss').innerText = data.loss;
+            document.getElementById('detail-trivia').innerText = data.trivia;
+            document.getElementById('detail-loc-text').innerText = data.loc;
+            
+            // Icon handling
+            document.getElementById('detail-icon-container').innerHTML = data.icon;
+            
+            // Class adjustments for color categories
+            const catBadge = document.getElementById('detail-category');
+            const iconContainer = document.getElementById('detail-icon-container');
+            const triviaBox = catBadge.parentElement.parentElement.parentElement.nextElementSibling.lastElementChild;
+            
+            // Reset colors
+            catBadge.className = "px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider";
+            iconContainer.className = "p-3 rounded-2xl shrink-0";
+            triviaBox.className = "p-4 rounded-2xl border";
+
+            if (data.themeColor === 'sky') {
+                catBadge.classList.add('text-sky-600', 'dark:text-sky-400', 'bg-sky-500/10');
+                iconContainer.classList.add('bg-sky-100', 'dark:bg-sky-950/60', 'text-sky-600', 'dark:text-sky-400');
+                triviaBox.classList.add('bg-brand-500/10', 'dark:bg-brand-500/5', 'border-brand-500/20');
+            } else if (data.themeColor === 'emerald') {
+                catBadge.classList.add('text-emerald-600', 'dark:text-emerald-400', 'bg-emerald-500/10');
+                iconContainer.classList.add('bg-emerald-100', 'dark:bg-emerald-950/60', 'text-emerald-600', 'dark:text-emerald-400');
+                triviaBox.classList.add('bg-emerald-500/10', 'dark:bg-emerald-500/5', 'border-emerald-500/20');
+            } else if (data.themeColor === 'amber') {
+                catBadge.classList.add('text-amber-600', 'dark:text-amber-400', 'bg-amber-500/10');
+                iconContainer.classList.add('bg-amber-100', 'dark:bg-amber-950/60', 'text-amber-600', 'dark:text-amber-400');
+                triviaBox.classList.add('bg-amber-500/10', 'dark:bg-amber-500/5', 'border-amber-500/20');
+            }
+        }
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+        }
+
+        function updateThemeIcons(isDark) {
+            const moonIcon = document.getElementById('moon-icon');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIconMob = document.getElementById('moon-icon-mobile');
+            const sunIconMob = document.getElementById('sun-icon-mobile');
+
+            if (isDark) {
+                moonIcon?.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIconMob?.classList.add('hidden');
+                sunIconMob?.classList.remove('hidden');
+            } else {
+                moonIcon?.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIconMob?.classList.remove('hidden');
+                sunIconMob?.classList.add('hidden');
+            }
+        }
+
+        // Mob menu toggling
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle?.addEventListener('click', () => {
+            mobileMenu?.classList.remove('hidden');
+        });
+
+        menuClose?.addEventListener('click', () => {
+            mobileMenu?.classList.add('hidden');
+        });
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu?.classList.add('hidden');
+            }
+        });
+
+        // Initialize Theme & Page Details
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateThemeIcons(isDark);
+
+        selectComponent('olt');
+    </script>
+</body>
+</html>

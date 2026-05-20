@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jornada do Provedor & Simulador de Campo - Guia FTTH</title>
+    <meta name="description" content="Entenda como funciona o fluxo de venda e ativação de internet de fibra óptica por trás dos panos e experimente o simulador interativo de casos de campo.">
+    <!-- Script de tema síncrono para evitar flash de luz -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col lg:flex-row antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg">F</div>
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Guia FTTH</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Alternar Tema">
+                <svg id="moon-icon-mobile" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon-mobile" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+            <button id="menu-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Abrir Menu">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden transition-all duration-300">
+        <div class="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 p-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <span class="font-extrabold text-xl tracking-wider text-brand-600 dark:text-brand-400">NAVEGAÇÃO</span>
+                    <button id="menu-close" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Início</span>
+                    </a>
+                    <a href="componentes.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Componentes da Rede</span>
+                    </a>
+                    <a href="jornada.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-brand-600 bg-brand-50/50 dark:bg-slate-800/50 dark:text-white transition-all">
+                        <span>Jornada & Simulador</span>
+                    </a>
+                    <a href="calculadora.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Calculadora</span>
+                    </a>
+                    <a href="tecnologias.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Tecnologias PON & Ferramentas</span>
+                    </a>
+                    <a href="glossario.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Glossário</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-400">
+                Guia Completo FTTH v2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex w-72 h-screen flex-col justify-between p-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 z-30">
+        <div class="space-y-8">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">F</div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">Guia de Rede FTTH</h1>
+                    <span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Tudo sobre Fibra</span>
+                </div>
+            </a>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Início
+                </a>
+                <a href="componentes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Componentes da Rede
+                </a>
+                <a href="jornada.html" class="sidebar-link active bg-slate-100 text-brand-600 dark:bg-slate-800/80 dark:text-white flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Jornada & Simulador
+                </a>
+                <a href="calculadora.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculadora Orçamento
+                </a>
+                <a href="tecnologias.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Tecnologias PON & Ferramentas
+                </a>
+                <a href="glossario.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Glossário Geral
+                </a>
+            </nav>
+        </div>
+
+        <!-- Theme Toggle and Info Footer -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-900">
+                <span class="text-xs font-semibold text-slate-500">Alternar Tema</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all focus:outline-none" aria-label="Alternar Tema">
+                    <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                </button>
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-600 text-center font-medium">
+                Guia Técnico de Fibra Óptica • 2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 lg:pl-80 min-h-screen space-y-12">
+        
+        <!-- Section: Jornada do Provedor -->
+        <section id="jornada-provedor" class="space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                    <span class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-400">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </span>
+                    Jornada do Provedor: Da Venda ao Provisionamento
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Entenda os bastidores comerciais e operacionais de um provedor de internet (ISP) ao vender e ativar uma internet de fibra óptica.</p>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+                <!-- Journey cards list (Left, takes 1 col on xl) -->
+                <div class="xl:col-span-1 space-y-3">
+                    <div class="glass-card rounded-2xl p-4 shadow-sm space-y-2">
+                        <!-- Step 1: Viabilidade -->
+                        <button onclick="selectJourneyStep('viabilidade')" id="journey-btn-viabilidade" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm ring-2 ring-brand-500 active-journey">
+                            <span class="w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">1</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Viabilidade & GIS</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Encontrar o endereço e qualificar</p>
+                            </div>
+                        </button>
+
+                        <!-- Step 2: Porta PON -->
+                        <button onclick="selectJourneyStep('olt_pon')" id="journey-btn-olt_pon" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">2</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">A Porta PON e Divisão</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Entendendo a alocação de portas</p>
+                            </div>
+                        </button>
+
+                        <!-- Step 3: Instalação e Manobras -->
+                        <button onclick="selectJourneyStep('instalacao')" id="journey-btn-instalacao" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">3</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Instalação e Manobras</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Problemas comuns na CTO de campo</p>
+                            </div>
+                        </button>
+
+                        <!-- Step 4: Provisionamento Lógico -->
+                        <button onclick="selectJourneyStep('ativacao')" id="journey-btn-ativacao" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">4</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Provisionamento Lógico</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Autenticação e liberação de sinal</p>
+                            </div>
+                        </button>
+
+                        <!-- Step 5: Mudança de Velocidade -->
+                        <button onclick="selectJourneyStep('velocidade')" id="journey-btn-velocidade" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">5</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Gestão de Banda (Upgrades)</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Mudar velocidade sem sair da central</p>
+                            </div>
+                        </button>
+
+                        <!-- Step 6: Cancelamento e Cabos Mortos -->
+                        <button onclick="selectJourneyStep('cancelamento')" id="journey-btn-cancelamento" class="journey-card w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 dark:hover:border-brand-500 focus:outline-none transition-all flex gap-3 shadow-sm">
+                            <span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">6</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Cancelamento & Cabos Mortos</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">O ciclo do cabo inativo no poste</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Detailed panel (Right, takes 2 cols on xl) -->
+                <div class="xl:col-span-2">
+                    <div id="journey-detail-panel" class="glass-card rounded-2xl p-6 md:p-8 shadow-lg border border-brand-500/20 space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div id="journey-icon-bg" class="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                                    <!-- Dynamic SVG icon -->
+                                </div>
+                                <div>
+                                    <span id="journey-tag" class="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-sky-500 text-white rounded">Comercial</span>
+                                    <h3 id="journey-title" class="text-xl font-bold mt-1 text-slate-800 dark:text-slate-100">1. Viabilidade Georreferenciada (GIS)</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Como funciona o processo</h4>
+                                <p id="journey-desc" class="text-sm text-slate-700 dark:text-slate-300 mt-2 leading-relaxed">
+                                    O cliente solicita a compra. A primeira etapa é verificar se existe cobertura física viável no endereço do cliente.
+                                </p>
+                            </div>
+
+                            <div class="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                <h5 class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                    Por trás dos panos (Bastidores do ISP)
+                                </h5>
+                                <p id="journey-behind" class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                    O sistema de vendas consulta as coordenadas geográficas...
+                                </p>
+                            </div>
+
+                            <div class="p-4 bg-brand-500/10 dark:bg-brand-500/5 rounded-2xl border border-brand-500/20">
+                                <h5 class="text-xs font-bold text-brand-600 dark:text-brand-400 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    Regra de Negócio & Desafios Reais
+                                </h5>
+                                <p id="journey-challenge" class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                    Se a casa estiver muito longe de qualquer CTO...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Simulador de Casos de Campo -->
+        <section id="simulador-campo" class="space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                    <span class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-400">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </span>
+                    Laboratório Prático: Simulador de Casos de Campo
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Experimente o dia a dia do técnico e do suporte técnico (NOC) simulando e resolvendo cenários reais de atendimento FTTH.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                <!-- Column 1: Selector and Action Buttons (Left) -->
+                <div class="space-y-6 lg:col-span-1 flex flex-col justify-between">
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 space-y-4">
+                        <h3 class="font-bold text-sm text-slate-400 dark:text-slate-500 uppercase tracking-wider">Escolha um Caso Técnico</h3>
+                        
+                        <div class="space-y-2">
+                            <!-- Scenario A -->
+                            <button onclick="selectSimScenario('padrao')" id="sim-card-padrao" class="sim-card w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 font-bold text-sm">A</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Instalação Padrão</h4>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Fluxo padrão sem intercorrências</p>
+                                </div>
+                            </button>
+
+                            <!-- Scenario B -->
+                            <button onclick="selectSimScenario('saturada')" id="sim-card-saturada" class="sim-card w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                                <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 font-bold text-sm">B</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">CTO Ocupada / Cabo Morto</h4>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Excesso de portas físicas no poste</p>
+                                </div>
+                            </button>
+
+                            <!-- Scenario C -->
+                            <button onclick="selectSimScenario('manobra')" id="sim-card-manobra" class="sim-card w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 font-bold text-sm">C</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Porta Quebrada (Manobra)</h4>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Sinal ruim na CTO e manobra do NOC</p>
+                                </div>
+                            </button>
+
+                            <!-- Scenario D -->
+                            <button onclick="selectSimScenario('distancia')" id="sim-card-distancia" class="sim-card w-full text-left p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 transition-all flex gap-3 shadow-sm focus:outline-none">
+                                <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 font-bold text-sm">D</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-xs md:text-sm">Limite de Drop (Fora de Alcance)</h4>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Chácara rural com drop muito longo</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action panel -->
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 space-y-4 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Ações e Progresso</h3>
+                            
+                            <!-- Mini Stepper visual -->
+                            <div class="flex justify-between items-center px-2 py-1">
+                                <div class="flex flex-col items-center gap-1" id="sim-step-1">
+                                    <div id="sim-step-dot-1" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-400">1</div>
+                                    <span class="text-[8px] text-slate-400 dark:text-slate-500 uppercase font-bold">Viabilidade</span>
+                                </div>
+                                <div class="h-0.5 w-6 bg-slate-200 dark:bg-slate-800 grow -mt-3"></div>
+                                <div class="flex flex-col items-center gap-1" id="sim-step-2">
+                                    <div id="sim-step-dot-2" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-400">2</div>
+                                    <span class="text-[8px] text-slate-400 dark:text-slate-500 uppercase font-bold">Instalação</span>
+                                </div>
+                                <div class="h-0.5 w-6 bg-slate-200 dark:bg-slate-800 grow -mt-3"></div>
+                                <div class="flex flex-col items-center gap-1" id="sim-step-3">
+                                    <div id="sim-step-dot-3" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-400">3</div>
+                                    <span class="text-[8px] text-slate-400 dark:text-slate-500 uppercase font-bold">Provisionar</span>
+                                </div>
+                                <div class="h-0.5 w-6 bg-slate-200 dark:bg-slate-800 grow -mt-3"></div>
+                                <div class="flex flex-col items-center gap-1" id="sim-step-4">
+                                    <div id="sim-step-dot-4" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-400">4</div>
+                                    <span class="text-[8px] text-slate-400 dark:text-slate-500 uppercase font-bold">Ativo</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action trigger -->
+                        <button onclick="advanceSim()" id="sim-action-btn" class="w-full py-3 px-4 rounded-xl font-bold bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 transition-all text-sm shadow-md cursor-not-allowed mt-4" disabled>
+                            Selecione um Caso
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Column 2 & 3: Console Terminal & Dashboard (Right) -->
+                <div class="lg:col-span-2 flex flex-col justify-between gap-6">
+                    <!-- Console box -->
+                    <div class="flex-grow flex flex-col rounded-2xl bg-slate-950 border border-slate-900 shadow-xl overflow-hidden min-h-[300px]">
+                        <!-- Console header bar -->
+                        <div class="bg-slate-900 px-4 py-2.5 flex items-center justify-between border-b border-slate-950">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                                <span class="text-[10px] md:text-xs font-mono font-bold text-slate-400 ml-2">terminal-operacoes@provedor-isp:~</span>
+                            </div>
+                            <span class="text-[9px] font-bold text-brand-500 uppercase tracking-widest px-2 py-0.5 bg-brand-500/10 rounded">Console Ativo</span>
+                        </div>
+                        
+                        <!-- Terminal logs -->
+                        <div id="sim-console" class="p-4 font-mono text-emerald-400 overflow-y-auto space-y-2 h-72 text-xs md:text-sm">
+                            <div class="text-slate-500 italic">Console de campo inativo... Escolha um caso ao lado para iniciar a simulação técnica.</div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic dashboard -->
+                    <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+                        <h4 class="font-bold text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Painel de Diagnóstico do Cliente</h4>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-900">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">CTO Destino</span>
+                                <p id="sim-dash-cto" class="text-sm font-bold text-slate-700 dark:text-slate-200 mt-0.5">--</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-900">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Porta Física</span>
+                                <p id="sim-dash-porta" class="text-sm font-bold text-slate-700 dark:text-slate-200 mt-0.5">--</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-900">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Potência Sinal</span>
+                                <p id="sim-dash-sinal" class="text-sm font-bold text-slate-700 dark:text-slate-200 mt-0.5">--</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-900">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Status ONU</span>
+                                <p id="sim-dash-onu" class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">Não Detectada</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Interactive Journey Step Data
+        const journeyData = {
+            viabilidade: {
+                title: "1. Viabilidade Georreferenciada (GIS)",
+                tag: "Comercial / Vendas",
+                themeColor: "sky",
+                desc: "O cliente solicita a compra. A primeira etapa é verificar no sistema georreferenciado se existe viabilidade física e lógica de rede para atender ao endereço solicitado.",
+                behind: "O sistema comercial consulta as coordenadas geográficas (latitude/longitude) do imóvel do cliente e cruza com o mapa da rede cadastrada para verificar se há uma CTO (Caixa de Terminação Óptica) no raio operacional. O cabo drop que vai do poste ao imóvel tem uma distância limite física (geralmente entre 150m e 200m) para evitar que o cabo quebre com o peso/vento e para evitar atenuação óptica excessiva.",
+                challenge: "Se a casa estiver muito longe de qualquer CTO, o sistema acusa <strong>Falta de Viabilidade Física</strong>. Mas se a CTO próxima estiver com todas as portas de atendimento ocupadas (100% cheia), a venda é classificada como <strong>Sem Viabilidade de Porta</strong> (CTO saturada). O cliente entra em uma fila de espera até que o provedor faça uma expansão de portas físicas no local.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`
+            },
+            olt_pon: {
+                title: "2. A Porta PON na OLT e a Divisão de Banda",
+                tag: "Arquitetura da Central",
+                themeColor: "sky",
+                desc: "Como a banda de internet e a luz da fibra são compartilhadas na central e a importância de reservar a porta antes da instalação.",
+                behind: "Na central (CO), a OLT possui placas com <strong>Portas PON</strong>. Cada porta PON atende múltiplos clientes (tipicamente 64 ou 128) através da divisão física do feixe de luz usando splitters. Assim, a capacidade de transmissão de dados é dividida entre os assinantes sob a mesma árvore PON. Os clientes não são agrupados linearmente — devido a vendas em datas diferentes, assinantes de ruas distantes ficam distribuídos de forma aleatória sob a mesma porta PON.",
+                challenge: "No momento da venda (viável), o sistema realiza a <strong>reserva de porta lógica</strong> (ex: Caixa CTO-05, Porta 4). Essa reserva sistêmica garante que outra venda não ocupe aquela vaga física e que a OLT saiba exatamente qual perfil aplicar. Se o instalador for a campo sem essa reserva feita, a OLT não reconhecerá a conexão, mesmo que haja sinal físico.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`
+            },
+            instalacao: {
+                title: "3. Instalação Física e Manobras de Porta",
+                tag: "Operação de Campo",
+                themeColor: "emerald",
+                desc: "O técnico vai a campo lançar o cabo drop físico, mas a realidade prática no poste pode exigir ajustes e manobras mecânicas.",
+                behind: "O técnico estica o cabo drop da CTO até a casa do cliente, instala a roseta (PTO) na parede e conecta o cordão à ONU. No entanto, ao abrir a caixa CTO no poste, o técnico pode descobrir que a porta designada no sistema está danificada (quebrada) ou já ocupada por outra conexão sem identificação (ligação pirata ou erro de inventário de outro instalador).",
+                challenge: "Caso isso ocorra, o técnico localiza outra porta livre e operacional na mesma caixa e conecta o cliente. Ele então entra em contato com o NOC (suporte interno) e solicita uma <strong>Manobra de Porta</strong>. O NOC atualiza o cadastro da rede no sistema, alterando o registro para a nova porta ocupada e liberando a porta danificada para manutenção, mantendo o inventário de portas do provedor 100% correto.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`
+            },
+            ativacao: {
+                title: "4. Provisionamento Lógico (Autenticação)",
+                tag: "Sistemas & TI",
+                themeColor: "emerald",
+                desc: "Uma vez conectado fisicamente, a internet só funciona após o equipamento ser autenticado e programado na OLT.",
+                behind: "Com a ONU conectada e o LED de sinal óptico (PON) estável, a OLT detecta o Serial Number único (SN ou MAC) do dispositivo do cliente. O instalador insere esse Serial no aplicativo técnico ou informa à central. O provisionador do provedor (software ACS) registra esse Serial Number e o associa ao cadastro comercial daquele cliente.",
+                challenge: "O provisionador envia comandos para a OLT autorizando o Serial. Automaticamente, o sistema emparelha o equipamento do cliente e injeta as configurações de rede sem intervenção humana: associa a VLAN correta, cria as credenciais de autenticação (PPPoE / IP Dinâmico) e define os limites de velocidade contratados pelo cliente.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`
+            },
+            velocidade: {
+                title: "5. Mudanças de Velocidade (Lógica de Banda)",
+                tag: "Gerência de Rede",
+                themeColor: "amber",
+                desc: "Como o provedor altera o plano (upgrade/downgrade) instantaneamente sem precisar alterar cabos ou visitar o local.",
+                behind: "Se o cliente solicita um upgrade de velocidade (ex: de 300 Mega para 600 Mega), o processo é feito totalmente por software. Ao atualizar o contrato no sistema comercial, o banco de dados envia a ordem para o provisionador central de forma eletrônica.",
+                challenge: "O provisionador atualiza o perfil de controle de tráfego (shaping/policing) na OLT ou no roteador concentrador (BNG/BRAS) associado àquele Serial Number da ONU. Em segundos, a OLT reconfigura o limite lógico de download e upload da fibra daquele cliente. O link é reiniciado digitalmente e o novo plano passa a valer instantaneamente.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`
+            },
+            cancelamento: {
+                title: "6. Cancelamento e o 'Cabo Morto' no Poste",
+                tag: "Ciclo do Cabo Físico",
+                themeColor: "amber",
+                desc: "O que acontece com os cabos de ex-clientes suspensos ou cancelados e a necessidade de realizar auditorias nas caixas.",
+                behind: "Quando um contrato de internet é cancelado ou cortado por inadimplência, o bloqueio do serviço é puramente lógico: o provisionador desautoriza o Serial Number da ONU na OLT e a conexão de internet é cortada. No entanto, o cabo drop físico e o conector continuam conectados fisicamente na CTO no poste. Isso ocorre porque enviar técnicos para subir no poste apenas para retirar um cabo inativo gera um custo operacional muito alto.",
+                challenge: "Esse cabo inativo e abandonado no poste é conhecido como <strong>cabo morto</strong>. Quando a CTO fica com todas as portas lotadas de novas vendas, o provedor agenda uma <strong>Auditoria e Limpeza de Caixa</strong>. Os técnicos vão a campo, realizam medições com canetas VFL / Power Meter para identificar quais cabos estão sem sinal ativo na OLT (ex-clientes), desconectam esses cabos mortos e liberam as portas físicas para novos clientes ativos.",
+                icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`
+            }
+        };
+
+        function selectJourneyStep(id) {
+            document.querySelectorAll('.journey-card').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-brand-500', 'active-journey');
+            });
+            
+            const activeBtn = document.getElementById(`journey-btn-${id}`);
+            if (activeBtn) {
+                activeBtn.classList.add('ring-2', 'ring-brand-500', 'active-journey');
+            }
+
+            const data = journeyData[id];
+            if (!data) return;
+
+            document.getElementById('journey-title').innerText = data.title;
+            document.getElementById('journey-desc').innerText = data.desc;
+            document.getElementById('journey-behind').innerHTML = data.behind;
+            document.getElementById('journey-challenge').innerHTML = data.challenge;
+            document.getElementById('journey-tag').innerText = data.tag;
+            
+            const tagBadge = document.getElementById('journey-tag');
+            tagBadge.className = "text-[10px] font-extrabold uppercase px-2 py-0.5 rounded text-white";
+            
+            const iconBg = document.getElementById('journey-icon-bg');
+            iconBg.className = "w-12 h-12 rounded-xl flex items-center justify-center shrink-0";
+
+            if (data.themeColor === 'sky') {
+                tagBadge.classList.add('bg-sky-500');
+                iconBg.classList.add('bg-sky-100', 'dark:bg-sky-950/60', 'text-sky-600', 'dark:text-sky-400');
+            } else if (data.themeColor === 'emerald') {
+                tagBadge.classList.add('bg-emerald-500');
+                iconBg.classList.add('bg-emerald-100', 'dark:bg-emerald-950/60', 'text-emerald-600', 'dark:text-emerald-400');
+            } else {
+                tagBadge.classList.add('bg-amber-500');
+                iconBg.classList.add('bg-amber-100', 'dark:bg-amber-950/60', 'text-amber-600', 'dark:text-amber-400');
+            }
+
+            document.getElementById('journey-icon-bg').innerHTML = data.icon;
+        }
+
+        // Field Simulator Machine State
+        let simState = {
+            scenario: null,
+            step: 0
+        };
+
+        function clearSimConsole() {
+            const consoleEl = document.getElementById('sim-console');
+            if (consoleEl) {
+                consoleEl.innerHTML = '';
+            }
+        }
+
+        function printSimConsole(text, type = 'info') {
+            const consoleEl = document.getElementById('sim-console');
+            if (!consoleEl) return;
+
+            const line = document.createElement('div');
+            line.className = 'py-1 border-b border-slate-900/10 dark:border-slate-800/40 text-xs md:text-sm leading-relaxed';
+            
+            let prefix = '[INFO]';
+            if (type === 'sys') {
+                prefix = '<span class="text-indigo-400 font-bold">[SISTEMA]</span>';
+            } else if (type === 'gis') {
+                prefix = '<span class="text-sky-400 font-bold">[GIS/COBERTURA]</span>';
+            } else if (type === 'tec') {
+                prefix = '<span class="text-amber-400 font-bold">[TÉCNICO]</span>';
+            } else if (type === 'noc') {
+                prefix = '<span class="text-purple-400 font-bold">[NOC/SUPORTE]</span>';
+            } else if (type === 'olt') {
+                prefix = '<span class="text-emerald-400 font-bold">[OLT/CENTRAL]</span>';
+            } else if (type === 'err') {
+                prefix = '<span class="text-red-500 font-bold">[ERRO]</span>';
+            } else if (type === 'ok') {
+                prefix = '<span class="text-emerald-500 font-bold">[SUCESSO]</span>';
+            }
+
+            line.innerHTML = `${prefix} ${text}`;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function updateSimProgress(activeStep, status = 'pending') {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`sim-step-${i}`);
+                const dot = document.getElementById(`sim-step-dot-${i}`);
+                if (!el || !dot) continue;
+
+                if (i < activeStep) {
+                    dot.className = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-emerald-500 text-white";
+                    dot.innerHTML = "✓";
+                } else if (i === activeStep) {
+                    if (status === 'error') {
+                        dot.className = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-red-500 text-white animate-pulse";
+                        dot.innerHTML = "✗";
+                    } else if (status === 'success') {
+                        dot.className = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-emerald-500 text-white animate-bounce";
+                        dot.innerHTML = "✓";
+                    } else {
+                        dot.className = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-brand-500 text-white animate-pulse";
+                        dot.innerHTML = i;
+                    }
+                } else {
+                    dot.className = "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600";
+                    dot.innerHTML = i;
+                }
+            }
+        }
+
+        function selectSimScenario(id) {
+            simState.scenario = id;
+            simState.step = 0;
+            
+            document.querySelectorAll('.sim-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-brand-500', 'bg-brand-50/20', 'dark:bg-brand-950/10');
+            });
+            
+            const activeCard = document.getElementById(`sim-card-${id}`);
+            if (activeCard) {
+                activeCard.classList.add('ring-2', 'ring-brand-500', 'bg-brand-50/20', 'dark:bg-brand-950/10');
+            }
+
+            clearSimConsole();
+            updateSimProgress(1);
+
+            document.getElementById('sim-dash-cto').innerText = '--';
+            document.getElementById('sim-dash-porta').innerText = '--';
+            document.getElementById('sim-dash-sinal').innerText = '--';
+            document.getElementById('sim-dash-onu').innerText = 'Não Detectada';
+            document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-slate-500 dark:text-slate-400';
+
+            const actionBtn = document.getElementById('sim-action-btn');
+            actionBtn.removeAttribute('disabled');
+            actionBtn.className = "w-full py-3 px-4 rounded-xl font-bold bg-brand-600 hover:bg-brand-700 text-white cursor-pointer transition-all text-sm shadow-md";
+            actionBtn.innerText = "Simular Viabilidade (GIS)";
+            
+            if (id === 'padrao') {
+                printSimConsole('Cenário A selecionado: Cliente residencial padrão em bairro cabeado.', 'sys');
+                printSimConsole('Pronto para iniciar consulta de cobertura GIS.', 'sys');
+            } else if (id === 'saturada') {
+                printSimConsole('Cenário B selecionado: CTO local com todas as 8 portas físicas ocupadas no sistema.', 'sys');
+                printSimConsole('Pronto para analisar a viabilidade.', 'sys');
+            } else if (id === 'manobra') {
+                printSimConsole('Cenário C selecionado: Instalação com problema físico na porta do poste (sinal ruim).', 'sys');
+                printSimConsole('Pronto para iniciar viabilidade.', 'sys');
+            } else if (id === 'distancia') {
+                printSimConsole('Cenário D selecionado: Solicitação rural com distância excessiva.', 'sys');
+                printSimConsole('Pronto para iniciar viabilidade.', 'sys');
+            }
+        }
+
+        function advanceSim() {
+            if (!simState.scenario) {
+                printSimConsole('Por favor, selecione um Cenário Técnico primeiro!', 'err');
+                return;
+            }
+
+            const actionBtn = document.getElementById('sim-action-btn');
+
+            if (simState.scenario === 'padrao') {
+                if (simState.step === 0) {
+                    printSimConsole('Iniciando análise GIS para o endereço do cliente...', 'sys');
+                    setTimeout(() => {
+                        printSimConsole('Coordenadas localizadas: Lat -23.5505, Long -46.6333', 'gis');
+                        printSimConsole('CTO mais próxima identificada: CTO-03 (Distância: 75m).', 'gis');
+                        printSimConsole('Ocupação da CTO-03: 4 de 8 portas ocupadas. Portas livres disponíveis!', 'gis');
+                        printSimConsole('Porta lógica 3 reservada sistemicamente para o novo contrato.', 'sys');
+                        printSimConsole('Viabilidade APROVADA. Ordem de serviço enviada para instalação em campo.', 'ok');
+                        
+                        document.getElementById('sim-dash-cto').innerText = 'CTO-03';
+                        document.getElementById('sim-dash-porta').innerText = 'Porta 3 (Reservada)';
+                        
+                        simState.step = 1;
+                        updateSimProgress(2);
+                        actionBtn.innerText = "Iniciar Instalação Física";
+                    }, 600);
+                } else if (simState.step === 1) {
+                    printSimConsole('Equipe técnica de campo chegou ao local.', 'tec');
+                    printSimConsole('Puxando cabo drop externo do poste (CTO-03) até a fachada do cliente (75m).', 'tec');
+                    printSimConsole('Roseta (PTO) instalada e cabo drop fixado.', 'tec');
+                    printSimConsole('ONU/ONT conectada com cordão óptico flexível.', 'tec');
+                    printSimConsole('Instalação física de campo concluída. Aguardando teste de sinal.', 'sys');
+                    
+                    document.getElementById('sim-dash-onu').innerText = 'Detectada (Sem Auth)';
+                    document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-amber-500';
+                    
+                    simState.step = 2;
+                    actionBtn.innerText = "Medir Sinal (Power Meter)";
+                } else if (simState.step === 2) {
+                    printSimConsole('Conectando o Power Meter na ponta do conector óptico...', 'tec');
+                    setTimeout(() => {
+                        printSimConsole('Potência de sinal óptico medida: -19.2 dBm.', 'tec');
+                        printSimConsole('Sinal está dentro da faixa aceitável OLT (-15 a -25 dBm). Excelente!', 'ok');
+                        
+                        document.getElementById('sim-dash-sinal').innerText = '-19.2 dBm';
+                        document.getElementById('sim-dash-porta').innerText = 'Porta 3 (Conectada)';
+                        
+                        simState.step = 3;
+                        updateSimProgress(3);
+                        actionBtn.innerText = "Provisionar ONU (Ativação)";
+                    }, 500);
+                } else if (simState.step === 3) {
+                    printSimConsole('OLT detectou Serial Number em discovery na porta PON: SN-GPON-8822', 'olt');
+                    printSimConsole('Provisionador ACS associou o Serial ao contrato ativo.', 'sys');
+                    printSimConsole('Injetando plano de velocidade contratado: 300 Mega de Download / 150 Mega de Upload.', 'olt');
+                    printSimConsole('VLAN de dados e telefonia configuradas na ONU via OLT.', 'olt');
+                    printSimConsole('Autenticação PPPoE concluída. ONU autorizada e navegando!', 'ok');
+                    
+                    document.getElementById('sim-dash-onu').innerText = 'SN-GPON-8822 (Ativa)';
+                    document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-emerald-500';
+                    
+                    simState.step = 4;
+                    updateSimProgress(4, 'success');
+                    actionBtn.innerText = "Reiniciar Simulação";
+                    actionBtn.className = "w-full py-3 px-4 rounded-xl font-bold bg-slate-600 text-white hover:bg-slate-700 transition-all text-sm shadow-md cursor-pointer";
+                } else if (simState.step === 4) {
+                    selectSimScenario('padrao');
+                }
+            } 
+            else if (simState.scenario === 'saturada') {
+                if (simState.step === 0) {
+                    printSimConsole('Iniciando análise GIS para o endereço do cliente...', 'sys');
+                    setTimeout(() => {
+                        printSimConsole('Coordenadas localizadas: Lat -23.5601, Long -46.6410', 'gis');
+                        printSimConsole('CTO mais próxima: CTO-09 (Distância: 110m).', 'gis');
+                        printSimConsole('Portas disponíveis na CTO-09: 0 de 8 livres (100% ocupada).', 'err');
+                        printSimConsole('ERRO: Viabilidade reprovada por esgotamento de portas físicas na caixa.', 'err');
+                        printSimConsole('NOC detectou que a CTO-09 possui 2 cabos de ex-clientes inativos (contratos cancelados).', 'noc');
+                        printSimConsole('Ação sugerida: Enviar manutenção para limpeza e auditoria de CTO.', 'noc');
+                        
+                        document.getElementById('sim-dash-cto').innerText = 'CTO-09';
+                        document.getElementById('sim-dash-porta').innerText = 'Esgotada (0 livres)';
+                        
+                        simState.step = 1;
+                        updateSimProgress(1, 'error');
+                        actionBtn.innerText = "Limpar CTO (Remover Cabos Mortos)";
+                    }, 600);
+                } else if (simState.step === 1) {
+                    printSimConsole('Equipe de manutenção enviada ao poste da CTO-09.', 'tec');
+                    printSimConsole('Testando portas físicas ocupadas com identificador de tráfego...', 'tec');
+                    printSimConsole('Porta 5 e Porta 7 não apresentam tráfego de dados ativo.', 'tec');
+                    printSimConsole('Confirmado no NOC: Contratos vinculados a essas portas foram cancelados há 6 meses.', 'noc');
+                    printSimConsole('Desplugando cabo morto físico da Porta 5 e removendo fiação antiga.', 'tec');
+                    printSimConsole('Porta 5 da CTO-09 agora está livre e limpa para novo uso!', 'ok');
+                    printSimConsole('Sistema de viabilidade atualizado. Porta 5 reservada com sucesso.', 'sys');
+                    
+                    document.getElementById('sim-dash-porta').innerText = 'Porta 5 (Reservada)';
+                    
+                    simState.step = 2;
+                    updateSimProgress(2);
+                    actionBtn.innerText = "Iniciar Instalação Física";
+                } else if (simState.step === 2) {
+                    printSimConsole('Instalador puxa o cabo drop (110m) até a residência.', 'tec');
+                    printSimConsole('Roseta PTO instalada. ONU conectada e ligada na tomada.', 'tec');
+                    printSimConsole('Medindo sinal óptico na Porta 5 da CTO-09...', 'tec');
+                    setTimeout(() => {
+                        printSimConsole('Sinal óptico medido: -18.5 dBm. Excelente potência.', 'ok');
+                        document.getElementById('sim-dash-sinal').innerText = '-18.5 dBm';
+                        document.getElementById('sim-dash-onu').innerText = 'Detectada (Sem Auth)';
+                        document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-amber-500';
+                        
+                        simState.step = 3;
+                        updateSimProgress(3);
+                        actionBtn.innerText = "Provisionar ONU (Ativação)";
+                    }, 500);
+                } else if (simState.step === 3) {
+                    printSimConsole('OLT identificou Serial Number GPON-SN-7744.', 'olt');
+                    printSimConsole('Provisionador ACS autenticou via login de serviço.', 'sys');
+                    printSimConsole('Injetando plano de 500 Mega de velocidade na OLT.', 'olt');
+                    printSimConsole('ONU provisionada com sucesso. Navegação de internet liberada!', 'ok');
+                    
+                    document.getElementById('sim-dash-onu').innerText = 'GPON-SN-7744 (Ativa)';
+                    document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-emerald-500';
+                    
+                    simState.step = 4;
+                    updateSimProgress(4, 'success');
+                    actionBtn.innerText = "Reiniciar Simulação";
+                    actionBtn.className = "w-full py-3 px-4 rounded-xl font-bold bg-slate-600 text-white hover:bg-slate-700 transition-all text-sm shadow-md cursor-pointer";
+                } else if (simState.step === 4) {
+                    selectSimScenario('saturada');
+                }
+            } 
+            else if (simState.scenario === 'manobra') {
+                if (simState.step === 0) {
+                    printSimConsole('Iniciando análise GIS para o endereço...', 'sys');
+                    setTimeout(() => {
+                        printSimConsole('CTO mais próxima identificada: CTO-12 (90m).', 'gis');
+                        printSimConsole('Porta 3 disponível e reservada pelo sistema para este cliente.', 'gis');
+                        printSimConsole('Viabilidade APROVADA. Ordem de serviço enviada a campo.', 'ok');
+                        
+                        document.getElementById('sim-dash-cto').innerText = 'CTO-12';
+                        document.getElementById('sim-dash-porta').innerText = 'Porta 3 (Reservada)';
+                        
+                        simState.step = 1;
+                        updateSimProgress(2);
+                        actionBtn.innerText = "Iniciar Instalação Física";
+                    }, 600);
+                } else if (simState.step === 1) {
+                    printSimConsole('Instalador launched the cabo drop and connected it to the client ONU.', 'tec');
+                    printSimConsole('Equipamento pronto. Técnico se prepara para medir sinal.', 'sys');
+                    
+                    simState.step = 2;
+                    actionBtn.innerText = "Medir Sinal (Power Meter)";
+                } else if (simState.step === 2) {
+                    printSimConsole('Conectando o Power Meter na fibra do cliente...', 'tec');
+                    setTimeout(() => {
+                        printSimConsole('Alerta: Potência medida: -32.5 dBm (Sinal Criticamente Fraco).', 'err');
+                        printSimConsole('Técnico sobe no poste e mede sinal diretamente na Porta 3 da CTO: -31 dBm.', 'tec');
+                        printSimConsole('Diagnóstico: Porta 3 da CTO está danificada física ou com acoplador quebrado.', 'err');
+                        printSimConsole('ERRO: Não é possível ativar o serviço nesta porta. Sinal inoperante.', 'err');
+                        
+                        document.getElementById('sim-dash-sinal').innerText = '-32.5 dBm';
+                        
+                        simState.step = 3;
+                        updateSimProgress(2, 'error');
+                        actionBtn.innerText = "Solicitar Manobra de Porta ao NOC";
+                    }, 600);
+                } else if (simState.step === 3) {
+                    printSimConsole('Técnico aciona o NOC/Suporte via chat técnico.', 'tec');
+                    printSimConsole('NOC analisando portas disponíveis na CTO-12...', 'noc');
+                    setTimeout(() => {
+                        printSimConsole('NOC localiza Porta 6 livre com sinal nominal de OLT (-19.5 dBm).', 'noc');
+                        printSimConsole('NOC executa Manobra Lógica: Cancela reserva da Porta 3 e migra cliente para a Porta 6.', 'noc');
+                        printSimConsole('NOC: "Manobra concluída. Cadastro atualizado. Técnico, por favor conecte o drop na Porta 6."', 'noc');
+                        printSimConsole('Técnico transfere o cabo drop da Porta 3 para a Porta 6 na CTO do poste.', 'tec');
+                        printSimConsole('Power Meter acusa nova medição na Porta 6: -20.1 dBm. Sinal Excelente!', 'ok');
+                        
+                        document.getElementById('sim-dash-porta').innerText = 'Porta 6 (Manobra)';
+                        document.getElementById('sim-dash-sinal').innerText = '-20.1 dBm';
+                        
+                        simState.step = 4;
+                        updateSimProgress(3);
+                        actionBtn.innerText = "Provisionar ONU (Ativação)";
+                    }, 800);
+                } else if (simState.step === 4) {
+                    printSimConsole('OLT detectou Serial Number GPON-SN-3366 na Porta 6.', 'olt');
+                    printSimConsole('Provisionador autentica PPPoE de serviço.', 'sys');
+                    printSimConsole('Injetando plano de 400 Mega com sucesso.', 'olt');
+                    printSimConsole('Ativação de internet via manobra lógica concluída com sucesso!', 'ok');
+                    
+                    document.getElementById('sim-dash-onu').innerText = 'GPON-SN-3366 (Ativa)';
+                    document.getElementById('sim-dash-onu').className = 'text-xs font-bold text-emerald-500';
+                    
+                    simState.step = 5;
+                    updateSimProgress(4, 'success');
+                    actionBtn.innerText = "Reiniciar Simulação";
+                    actionBtn.className = "w-full py-3 px-4 rounded-xl font-bold bg-slate-600 text-white hover:bg-slate-700 transition-all text-sm shadow-md cursor-pointer";
+                } else if (simState.step === 5) {
+                    selectSimScenario('manobra');
+                }
+            } 
+            else if (simState.scenario === 'distancia') {
+                if (simState.step === 0) {
+                    printSimConsole('Iniciando análise GIS para chácara rural...', 'sys');
+                    setTimeout(() => {
+                        printSimConsole('Coordenadas localizadas: Lat -23.5890, Long -46.6901', 'gis');
+                        printSimConsole('CTO mais próxima identificada: CTO-20.', 'gis');
+                        printSimConsole('Distância calculada até o imóvel: 345 metros.', 'gis');
+                        printSimConsole('ERRO: Distância excede o limite máximo de segurança de 200m.', 'err');
+                        printSimConsole('O drop de 345 metros no ar acumula peso de chuva/vento e sofrerá quebras constantes.', 'err');
+                        printSimConsole('Sinal óptico atenuaria muito. Venda REPROVADA por Falta de Viabilidade Física.', 'err');
+                        printSimConsole('Cadastro arquivado. NOC encaminha demanda de ampliação de rede para a Engenharia.', 'noc');
+                        
+                        document.getElementById('sim-dash-cto').innerText = 'CTO-20 (Fora)';
+                        document.getElementById('sim-dash-porta').innerText = 'Não Disponível';
+                        
+                        simState.step = 1;
+                        updateSimProgress(1, 'error');
+                        actionBtn.innerText = "Reiniciar Simulação";
+                        actionBtn.className = "w-full py-3 px-4 rounded-xl font-bold bg-slate-600 text-white hover:bg-slate-700 transition-all text-sm shadow-md cursor-pointer";
+                    }, 600);
+                } else if (simState.step === 1) {
+                    selectSimScenario('distancia');
+                }
+            }
+        }
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+        }
+
+        function updateThemeIcons(isDark) {
+            const moonIcon = document.getElementById('moon-icon');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIconMob = document.getElementById('moon-icon-mobile');
+            const sunIconMob = document.getElementById('sun-icon-mobile');
+
+            if (isDark) {
+                moonIcon?.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIconMob?.classList.add('hidden');
+                sunIconMob?.classList.remove('hidden');
+            } else {
+                moonIcon?.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIconMob?.classList.remove('hidden');
+                sunIconMob?.classList.add('hidden');
+            }
+        }
+
+        // Mob menu toggling
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle?.addEventListener('click', () => {
+            mobileMenu?.classList.remove('hidden');
+        });
+
+        menuClose?.addEventListener('click', () => {
+            mobileMenu?.classList.add('hidden');
+        });
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu?.classList.add('hidden');
+            }
+        });
+
+        // Initialize Theme & Page Details
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateThemeIcons(isDark);
+
+        selectJourneyStep('viabilidade');
+    </script>
+</body>
+</html>

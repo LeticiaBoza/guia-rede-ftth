@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossário Geral de Fibra Óptica - Guia FTTH</title>
+    <meta name="description" content="Consulte definições rápidas, objetivas e detalhadas de siglas, termos técnicos e conceitos de redes FTTH e fibra óptica.">
+    <!-- Script de tema síncrono para evitar flash de luz -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col lg:flex-row antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg">F</div>
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Guia FTTH</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Alternar Tema">
+                <svg id="moon-icon-mobile" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon-mobile" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+            <button id="menu-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Abrir Menu">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden transition-all duration-300">
+        <div class="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 p-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <span class="font-extrabold text-xl tracking-wider text-brand-600 dark:text-brand-400">NAVEGAÇÃO</span>
+                    <button id="menu-close" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Início</span>
+                    </a>
+                    <a href="componentes.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Componentes da Rede</span>
+                    </a>
+                    <a href="jornada.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Jornada & Simulador</span>
+                    </a>
+                    <a href="calculadora.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Calculadora</span>
+                    </a>
+                    <a href="tecnologias.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Tecnologias PON & Ferramentas</span>
+                    </a>
+                    <a href="glossario.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-brand-600 bg-brand-50/50 dark:bg-slate-800/50 dark:text-white transition-all">
+                        <span>Glossário</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-400">
+                Guia Completo FTTH v2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex w-72 h-screen flex-col justify-between p-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 z-30">
+        <div class="space-y-8">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">F</div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">Guia de Rede FTTH</h1>
+                    <span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Tudo sobre Fibra</span>
+                </div>
+            </a>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Início
+                </a>
+                <a href="componentes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Componentes da Rede
+                </a>
+                <a href="jornada.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Jornada & Simulador
+                </a>
+                <a href="calculadora.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculadora Orçamento
+                </a>
+                <a href="tecnologias.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Tecnologias PON & Ferramentas
+                </a>
+                <a href="glossario.html" class="sidebar-link active bg-slate-100 text-brand-600 dark:bg-slate-800/80 dark:text-white flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Glossário Geral
+                </a>
+            </nav>
+        </div>
+
+        <!-- Theme Toggle and Info Footer -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-900">
+                <span class="text-xs font-semibold text-slate-500">Alternar Tema</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all focus:outline-none" aria-label="Alternar Tema">
+                    <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                </button>
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-600 text-center font-medium">
+                Guia Técnico de Fibra Óptica • 2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 lg:pl-80 min-h-screen space-y-12">
+        
+        <!-- Section: Interactive Glossary -->
+        <section id="glossario" class="space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                        <span class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/60 text-brand-600 dark:text-brand-400">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </span>
+                        Glossário Completo de Termos
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm md:text-base">Consulte definições rápidas e objetivas dos principais conceitos e siglas.</p>
+                </div>
+                
+                <!-- Search bar input -->
+                <div class="relative w-full md:w-80">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </span>
+                    <input type="text" id="glossary-search" placeholder="Buscar termo ou sigla..." class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none shadow-sm">
+                </div>
+            </div>
+
+            <!-- Categories filters -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="filterGlossary('todos')" class="glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white dark:bg-brand-500 transition-all">Todos</button>
+                <button onclick="filterGlossary('central')" class="glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Central</button>
+                <button onclick="filterGlossary('externa')" class="glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Rede Externa</button>
+                <button onclick="filterGlossary('cliente')" class="glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Cliente</button>
+                <button onclick="filterGlossary('conceitos')" class="glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">Conceitos Físicos</button>
+            </div>
+
+            <!-- Glossary Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="glossary-grid">
+                <!-- Item 1 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="central" data-term="olt">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">OLT (Optical Line Terminal)</h4>
+                        <span class="text-[9px] uppercase font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded">Central</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Equipamento concentrador óptico localizado na central do provedor. Ele cria e controla a distribuição de internet sobre os canais ópticos.
+                    </p>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="central" data-term="dio">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">DIO (Distribuidor Interno Óptico)</h4>
+                        <span class="text-[9px] uppercase font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded">Central</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Chassi que organiza e protege a conexão das fibras que vêm de fora com as portas ópticas da OLT através de pigtails e fusões.
+                    </p>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="central" data-term="pigtail">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">Pigtail</h4>
+                        <span class="text-[9px] uppercase font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded">Central</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Pedaço curto de fibra com um conector em apenas uma das extremidades, utilizado para emendas rápidas por fusão dentro do DIO.
+                    </p>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="externa" data-term="ceo">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">CEO (Caixa de Emenda Óptica)</h4>
+                        <span class="text-[9px] uppercase font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">Rede Externa</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Caixa estanque que protege as emendas de fibra por fusão e os splitters de 1º nível contra intempéries do ambiente na rua.
+                    </p>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="externa" data-term="splitter">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">Splitter (Divisor Óptico)</h4>
+                        <span class="text-[9px] uppercase font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">Rede Externa</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Dispositivo óptico passivo (não necessita de energia) que divide o feixe de luz de uma fibra em várias saídas idênticas (1:2, 1:4, 1:8, 1:16, etc).
+                    </p>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="externa" data-term="cto">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">CTO (Caixa de Terminação Óptica)</h4>
+                        <span class="text-[9px] uppercase font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">Rede Externa</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        A caixa fixada no poste que contém o splitter final e os adaptadores ópticos para conexão individual de cada cabo drop do cliente.
+                    </p>
+                </div>
+
+                <!-- Item 7 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="cliente" data-term="cabo drop">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">Cabo Drop</h4>
+                        <span class="text-[9px] uppercase font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">Cliente</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Cabo flexível e autossustentado de fibra óptica individual que conecta o poste (CTO) até o interior do imóvel do cliente.
+                    </p>
+                </div>
+
+                <!-- Item 8 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="cliente" data-term="fast connector">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">Fast Connector (Conector Rápido)</h4>
+                        <span class="text-[9px] uppercase font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">Cliente</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Conector de montagem puramente mecânica instalado na ponta da fibra na própria rua ou casa, dispensando fusão a calor.
+                    </p>
+                </div>
+
+                <!-- Item 9 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="cliente" data-term="pto roseta">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">PTO (Ponto de Terminação Óptica)</h4>
+                        <span class="text-[9px] uppercase font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">Cliente</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Pequena caixa de parede (também chamada de Roseta) que atua como barreira física protegendo a terminação rígida do cabo drop.
+                    </p>
+                </div>
+
+                <!-- Item 10 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="cliente" data-term="onu ont">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">ONU / ONT (Optical Network Unit)</h4>
+                        <span class="text-[9px] uppercase font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">Cliente</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Equipamento terminal que converte os pulsos ópticos recebidos da fibra em cabos de rede de cobre Ethernet e sinais Wi-Fi.
+                    </p>
+                </div>
+
+                <!-- Item 11 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="conceitos" data-term="wdm">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">WDM (Wavelength Division Multiplexing)</h4>
+                        <span class="text-[9px] uppercase font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded">Física</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        Multiplexação por Divisão de Comprimento de Onda. Permite transmitir download e upload simultâneos usando cores diferentes na mesma fibra.
+                    </p>
+                </div>
+
+                <!-- Item 12 -->
+                <div class="glossary-card glass-card p-5 rounded-2xl hover:border-brand-500/30 transition-all" data-category="conceitos" data-term="dbm db">
+                    <div class="flex items-center gap-2 justify-between">
+                        <h4 class="font-bold text-base text-brand-600 dark:text-brand-400">Potência Óptica (dBm / dB)</h4>
+                        <span class="text-[9px] uppercase font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded">Física</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                        O dBm é a unidade que mede a potência absoluta da luz. O dB expressa a perda relativa de potência (atenuação) ao longo do trajeto físico.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Glossary Filtering and Search logic
+        const glossarySearch = document.getElementById('glossary-search');
+        
+        glossarySearch.addEventListener('keyup', () => {
+            performGlossaryFilter();
+        });
+
+        let currentActiveCategory = 'todos';
+
+        function filterGlossary(category) {
+            currentActiveCategory = category;
+
+            document.querySelectorAll('.glossary-filter-btn').forEach(btn => {
+                btn.className = "glossary-filter-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all";
+                if (btn.innerText.toLowerCase() === category || (category === 'todos' && btn.innerText.toLowerCase() === 'todos')) {
+                    btn.classList.add('bg-brand-600', 'text-white', 'dark:bg-brand-50');
+                } else {
+                    btn.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-300', 'border', 'border-slate-200', 'dark:border-slate-800', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+                }
+            });
+
+            performGlossaryFilter();
+        }
+
+        function performGlossaryFilter() {
+            const query = glossarySearch.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.glossary-card');
+
+            cards.forEach(card => {
+                const termCategory = card.getAttribute('data-category');
+                const termText = card.querySelector('h4').innerText.toLowerCase();
+                const termDesc = card.querySelector('p').innerText.toLowerCase();
+                
+                const matchesCategory = currentActiveCategory === 'todos' || termCategory === currentActiveCategory;
+                const matchesSearch = termText.includes(query) || termDesc.includes(query);
+
+                if (matchesCategory && matchesSearch) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+        }
+
+        function updateThemeIcons(isDark) {
+            const moonIcon = document.getElementById('moon-icon');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIconMob = document.getElementById('moon-icon-mobile');
+            const sunIconMob = document.getElementById('sun-icon-mobile');
+
+            if (isDark) {
+                moonIcon?.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIconMob?.classList.add('hidden');
+                sunIconMob?.classList.remove('hidden');
+            } else {
+                moonIcon?.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIconMob?.classList.remove('hidden');
+                sunIconMob?.classList.add('hidden');
+            }
+        }
+
+        // Mob menu toggling
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle?.addEventListener('click', () => {
+            mobileMenu?.classList.remove('hidden');
+        });
+
+        menuClose?.addEventListener('click', () => {
+            mobileMenu?.classList.add('hidden');
+        });
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu?.classList.add('hidden');
+            }
+        });
+
+        // Initialize Theme & Page Details
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme ? savedTheme === 'dark' : systemPrefersDark;
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateThemeIcons(isDark);
+
+        filterGlossary('todos');
+    </script>
+</body>
+</html>

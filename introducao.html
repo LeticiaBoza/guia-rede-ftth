@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introdução à Fibra Óptica - Guia FTTH</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Theme Toggle Script (Avoids Flash) -->
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Pulse Animation for Map Nodes */
+        @keyframes custom-pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.4;
+            }
+        }
+        .map-pulse {
+            animation: custom-pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col lg:flex-row antialiased">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg">F</div>
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-indigo-300">Guia FTTH</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Alternar Tema">
+                <svg id="moon-icon-mobile" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon-mobile" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+            <button id="menu-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none" aria-label="Abrir Menu">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden transition-all duration-300">
+        <div class="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 p-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <span class="font-extrabold text-xl tracking-wider text-brand-600 dark:text-brand-400">NAVEGAÇÃO</span>
+                    <button id="menu-close" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Início</span>
+                    </a>
+                    <a href="introducao.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-brand-600 bg-brand-50/50 dark:bg-slate-800/50 dark:text-white transition-all">
+                        <span>Como Funciona a Fibra</span>
+                    </a>
+                    <a href="componentes.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Componentes da Rede</span>
+                    </a>
+                    <a href="jornada.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Jornada & Simulador</span>
+                    </a>
+                    <a href="calculadora.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Calculadora</span>
+                    </a>
+                    <a href="tecnologias.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Tecnologias PON & Ferramentas</span>
+                    </a>
+                    <a href="glossario.html" class="mobile-nav-link flex items-center gap-3 p-3 rounded-xl font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all">
+                        <span>Glossário</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-400">
+                Guia Completo FTTH v2.0
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex w-72 h-screen flex-col justify-between p-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 z-30">
+        <div class="space-y-8">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-brand-500/20 transition-transform group-hover:scale-105">F</div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">Guia de Rede FTTH</h1>
+                    <span class="text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">Tudo sobre Fibra</span>
+                </div>
+            </a>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Início
+                </a>
+                <a href="introducao.html" class="sidebar-link active bg-slate-100 text-brand-600 dark:bg-slate-800/80 dark:text-white flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Como Funciona a Fibra
+                </a>
+                <a href="componentes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Componentes da Rede
+                </a>
+                <a href="jornada.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Jornada & Simulador
+                </a>
+                <a href="calculadora.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    Calculadora
+                </a>
+                <a href="tecnologias.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Tecnologias PON & Ferramentas
+                </a>
+                <a href="glossario.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    Glossário
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer Toggle -->
+        <div class="border-t border-slate-200 dark:border-slate-800 pt-4 flex items-center justify-between">
+            <span class="text-xs text-slate-400 dark:text-slate-500 font-semibold">Tema</span>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 focus:outline-none transition-all" aria-label="Alternar Tema">
+                <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 lg:ml-72 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-7xl">
+        
+        <!-- Header Section -->
+        <section class="mb-8 md:mb-12">
+            <span class="px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-500/10 rounded-full">Didático para Iniciantes</span>
+            <h2 class="text-3xl md:text-5xl font-black tracking-tight text-slate-800 dark:text-slate-100 mt-3 leading-tight">Como Funciona a Fibra Óptica?</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm md:text-base mt-2 max-w-3xl leading-relaxed">
+                Descubra a fascinante física que guia a luz em fios de vidro, a jornada épica da internet pelos cabos submarinos e a distribuição nacional pelas rodovias de dados do Brasil.
+            </p>
+        </section>
+
+        <!-- Refraction Sandbox: "Simule a Luz" -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
+                
+                <!-- Explanation (2 cols) -->
+                <div class="lg:col-span-2 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                            <h3 class="font-extrabold text-lg text-slate-800 dark:text-slate-100 uppercase tracking-wide text-xs">O Fenômeno Físico</h3>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-700 dark:text-slate-200">A Reflexão Interna Total</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                            A fibra óptica é composta por duas partes de vidro puríssimo: o <strong>Núcleo</strong> (por onde a luz entra) e a <strong>Casca</strong> (que envolve o núcleo).
+                        </p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                            Como a Casca possui um índice de refração menor, ela age como um <strong>espelho perfeito</strong>. Se o laser entrar no ângulo correto, a luz bate na divisa do núcleo com a casca e rebate, ficando presa lá dentro, mesmo se a fibra fizer curvas acentuadas!
+                        </p>
+                    </div>
+
+                    <!-- Sandbox Controls -->
+                    <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+                        <label for="angle-slider" class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Ajustar Ângulo do Laser</label>
+                        <div class="flex items-center gap-4">
+                            <input id="angle-slider" type="range" min="5" max="60" value="15" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <span id="angle-value" class="text-sm font-extrabold text-slate-800 dark:text-slate-200 w-12 shrink-0 text-right">15°</span>
+                        </div>
+                        <div id="sandbox-feedback" class="p-3.5 rounded-xl text-xs font-semibold mt-3 transition-colors duration-300">
+                            Carregando...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Canvas (3 cols) -->
+                <div class="lg:col-span-3 glass-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center shadow-md relative min-h-[300px]">
+                    <span class="absolute top-4 left-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Laboratório de Óptica Virtual</span>
+                    
+                    <!-- SVG Interactive Simulation -->
+                    <svg id="refraction-svg" viewBox="0 0 500 200" class="w-full max-w-[450px] overflow-visible mt-6">
+                        <!-- Fiber Core -->
+                        <rect x="50" y="60" width="400" height="80" rx="4" fill="rgba(14, 165, 233, 0.08)" stroke="rgba(14, 165, 233, 0.3)" stroke-width="2"/>
+                        <!-- Core Cladding Boundary lines -->
+                        <line x1="50" y1="60" x2="450" y2="60" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4 4" class="opacity-60"/>
+                        <line x1="50" y1="140" x2="450" y2="140" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4 4" class="opacity-60"/>
+                        
+                        <!-- Core Text -->
+                        <text x="250" y="105" fill="rgba(14, 165, 233, 0.5)" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">NÚCLEO DA FIBRA (VIDRO)</text>
+                        <!-- Cladding Texts -->
+                        <text x="250" y="45" fill="rgba(100, 116, 139, 0.4)" font-size="8" font-weight="bold" text-anchor="middle">CASCA (REVESTIMENTO)</text>
+                        <text x="250" y="165" fill="rgba(100, 116, 139, 0.4)" font-size="8" font-weight="bold" text-anchor="middle">CASCA (REVESTIMENTO)</text>
+                        
+                        <!-- Laser Source -->
+                        <path d="M 0 100 L 45 100" stroke="#f43f5e" stroke-width="3" stroke-linecap="round"/>
+                        <rect x="0" y="88" width="45" height="24" rx="4" fill="#e11d48" class="shadow-lg"/>
+                        <circle cx="45" cy="100" r="3" fill="#fff"/>
+                        <text x="22" y="103" fill="#fff" font-size="8" font-weight="bold" text-anchor="middle">LASER</text>
+
+                        <!-- Glowing Beam path (Calculated dynamically) -->
+                        <path id="laser-beam" d="" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]"/>
+                    </svg>
+
+                    <div class="flex gap-6 mt-6 w-full justify-around border-t border-slate-100 dark:border-slate-800 pt-4 text-[10px] text-slate-400">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-1.5 bg-brand-500/20 border border-brand-500 rounded-sm"></span>
+                            <span>Núcleo (n1 = 1.48)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-1.5 bg-slate-300 border border-slate-400 rounded-sm"></span>
+                            <span>Casca (n2 = 1.46)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-0.5 bg-rose-500 block"></span>
+                            <span>Laser Infravermelho</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Submarine Cables and Distribution Section -->
+        <section class="mb-12 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+            
+            <!-- Tech Text (2 cols) -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <h3 class="font-extrabold text-lg text-slate-800 dark:text-slate-100 uppercase tracking-wide text-xs">Jornada Global dos Dados</h3>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-700 dark:text-slate-200">De onde vem a internet?</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Ao contrário do que muitos pensam, <strong>99% da internet internacional trafega por cabos submarinos</strong> no fundo dos oceanos, e não por satélites. Satélites têm muita latência (atraso) e capacidade menor.
+                    </p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Esses cabos são da espessura de uma latinha de refrigerante devido às proteções metálicas, mas contêm em seu miolo minúsculos filamentos de vidro que carregam terabits de dados por segundo de um continente a outro.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">Como funciona o mapa:</h4>
+                    <ul class="text-xs text-slate-500 dark:text-slate-400 space-y-2 list-disc pl-4">
+                        <li><strong>Cabos Submarinos (Linhas Pontilhadas Azuis)</strong> chegam pelas praias do litoral brasileiro vindos dos EUA, Europa e África.</li>
+                        <li><strong>Estações de Ancoragem (Bolas Verdes)</strong> ligam a fibra do mar à rede terrestre.</li>
+                        <li><strong>Backbones (Linhas Contínuas Roxas)</strong> são as rodovias de dados terrestres de alta performance do país.</li>
+                    </ul>
+                </div>
+
+                <!-- Info Box dynamically updated -->
+                <div id="map-info-card" class="p-5 rounded-2xl border border-indigo-100 dark:border-indigo-950 bg-indigo-500/5 dark:bg-indigo-500/10 space-y-3 transition-all duration-300">
+                    <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <h4 id="map-info-title" class="font-extrabold text-sm tracking-tight">Selecione um ponto no mapa</h4>
+                    </div>
+                    <p id="map-info-desc" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Clique em um dos nós pulsantes no mapa do Brasil para ver de perto o que acontece com a internet naquele ponto geográfico.
+                    </p>
+                    <div id="map-info-stats" class="text-[10px] uppercase font-bold text-slate-400 mt-2 flex gap-4">
+                        <!-- Stats dynamic -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brazil Network Map (3 cols) -->
+            <div class="lg:col-span-3 glass-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-md relative flex flex-col justify-center items-center">
+                <span class="absolute top-4 left-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rede de Trânsito Óptico Nacional</span>
+                
+                <!-- Stylized Brazil Map -->
+                <svg id="brazil-map-svg" viewBox="0 0 600 650" class="w-full max-w-[500px] h-auto overflow-visible select-none mt-4">
+                    <!-- Stylized Brazil Border Path (High Tech Grid Style Concept) -->
+                    <!-- This path represents a simplified geographic contour of Brazil -->
+                    <path d="M 230 110 
+                             L 350 90 
+                             L 460 110 
+                             L 540 180 
+                             L 510 280 
+                             L 480 320 
+                             L 500 380 
+                             L 490 440 
+                             L 450 490 
+                             L 390 530 
+                             L 350 590 
+                             L 330 610 
+                             L 300 580 
+                             L 270 510 
+                             L 210 470 
+                             L 180 430 
+                             L 140 400 
+                             L 110 320 
+                             L 80 290 
+                             L 90 220 
+                             L 130 180 
+                             L 180 160 
+                             Z" 
+                          fill="rgba(30, 41, 59, 0.05)" 
+                          stroke="rgba(100, 116, 139, 0.2)" 
+                          stroke-width="2.5" 
+                          class="dark:fill-slate-900/30 dark:stroke-slate-800/80"/>
+
+                    <!-- Internal Dotted Fill effect for Brazil Map -->
+                    <pattern id="dotPattern" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                        <circle cx="4" cy="4" r="1.5" fill="rgba(148, 163, 184, 0.15)" class="dark:fill-slate-700/30"/>
+                    </pattern>
+                    <path d="M 230 110 L 350 90 L 460 110 L 540 180 L 510 280 L 480 320 L 500 380 L 490 440 L 450 490 L 390 530 L 350 590 L 330 610 L 300 580 L 270 510 L 210 470 L 180 430 L 140 400 L 110 320 L 80 290 L 90 220 L 130 180 L 180 160 Z" fill="url(#dotPattern)"/>
+
+                    <!-- Submarine Cables (Entering from Atlantic) -->
+                    <!-- Cable 1 from USA to Fortaleza -->
+                    <path d="M 590 20 L 580 50 Q 560 120 480 150" fill="none" stroke="#6366f1" stroke-dasharray="4 4" stroke-width="2" class="opacity-80"/>
+                    <text x="590" y="15" fill="#6366f1" font-size="8" font-weight="extrabold" text-anchor="end">Cabo AMX-1 (EUA)</text>
+
+                    <!-- Cable 2 from Europe to Fortaleza -->
+                    <path d="M 590 120 Q 550 140 480 150" fill="none" stroke="#6366f1" stroke-dasharray="4 4" stroke-width="2" class="opacity-80"/>
+                    <text x="595" y="115" fill="#6366f1" font-size="8" font-weight="extrabold" text-anchor="end">Cabo EllaLink (Europa)</text>
+
+                    <!-- Cable 3 from Africa to Fortaleza -->
+                    <path d="M 590 180 Q 540 170 480 150" fill="none" stroke="#6366f1" stroke-dasharray="4 4" stroke-width="2" class="opacity-80"/>
+                    <text x="595" y="188" fill="#6366f1" font-size="8" font-weight="extrabold" text-anchor="end">Cabo SACS (África)</text>
+
+                    <!-- Subsea Cables connecting coastal CLS nodes -->
+                    <!-- Fortaleza -> Salvador -> Rio -> Santos -->
+                    <path d="M 480 150 Q 520 230 485 270" fill="none" stroke="#38bdf8" stroke-dasharray="3 3" stroke-width="1.5"/>
+                    <path d="M 485 270 Q 480 340 420 420" fill="none" stroke="#38bdf8" stroke-dasharray="3 3" stroke-width="1.5"/>
+                    <path d="M 420 420 L 375 450" fill="none" stroke="#38bdf8" stroke-dasharray="3 3" stroke-width="1.5"/>
+
+                    <!-- Terrestrial Backbones (Highways of light) -->
+                    <!-- Fortaleza -> Brasília -->
+                    <line x1="480" y1="150" x2="350" y2="340" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- Salvador -> Brasília -->
+                    <line x1="485" y1="270" x2="350" y2="340" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- Rio -> São Paulo -->
+                    <line x1="420" y1="420" x2="360" y2="440" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- Santos/Praia Grande -> São Paulo -->
+                    <line x1="375" y1="450" x2="360" y2="440" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- Brasília -> São Paulo -->
+                    <line x1="350" y1="340" x2="360" y2="440" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- São Paulo -> Porto Alegre -->
+                    <line x1="360" y1="440" x2="280" y2="560" stroke="#818cf8" stroke-width="3" class="opacity-80"/>
+                    <!-- Brasília -> Manaus (Subfluvial/Aéreo) -->
+                    <path d="M 350 340 Q 250 250 170 230" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 5" class="opacity-80"/>
+
+                    <!-- Map Interaction Nodes (Clickable group) -->
+                    
+                    <!-- 1. Fortaleza (Landing Point) -->
+                    <g onclick="selectMapNode('fortaleza')" class="cursor-pointer group">
+                        <circle cx="480" cy="150" r="14" fill="rgba(16, 185, 129, 0.2)" class="map-pulse"/>
+                        <circle cx="480" cy="150" r="6" fill="#10b981" stroke="#fff" stroke-width="1.5" class="group-hover:fill-emerald-400 transition-all"/>
+                        <text x="488" y="145" fill="#10b981" font-size="9" font-weight="extrabold" class="dark:fill-emerald-400">Fortaleza (CLS)</text>
+                    </g>
+
+                    <!-- 2. Salvador (Landing Point) -->
+                    <g onclick="selectMapNode('salvador')" class="cursor-pointer group">
+                        <circle cx="485" cy="270" r="12" fill="rgba(16, 185, 129, 0.2)" class="map-pulse"/>
+                        <circle cx="485" cy="270" r="5" fill="#10b981" stroke="#fff" stroke-width="1.5" class="group-hover:fill-emerald-400 transition-all"/>
+                        <text x="493" y="274" fill="#10b981" font-size="9" font-weight="extrabold" class="dark:fill-emerald-400">Salvador (CLS)</text>
+                    </g>
+
+                    <!-- 3. Rio de Janeiro (Landing Point) -->
+                    <g onclick="selectMapNode('rio')" class="cursor-pointer group">
+                        <circle cx="420" cy="420" r="12" fill="rgba(16, 185, 129, 0.2)" class="map-pulse"/>
+                        <circle cx="420" cy="420" r="5" fill="#10b981" stroke="#fff" stroke-width="1.5" class="group-hover:fill-emerald-400 transition-all"/>
+                        <text x="428" y="424" fill="#10b981" font-size="9" font-weight="extrabold" class="dark:fill-emerald-400">Rio de Janeiro (CLS)</text>
+                    </g>
+
+                    <!-- 4. Praia Grande / Santos (Landing Point) -->
+                    <g onclick="selectMapNode('santos')" class="cursor-pointer group">
+                        <circle cx="375" cy="450" r="12" fill="rgba(16, 185, 129, 0.2)" class="map-pulse"/>
+                        <circle cx="375" cy="450" r="5" fill="#10b981" stroke="#fff" stroke-width="1.5" class="group-hover:fill-emerald-400 transition-all"/>
+                        <text x="360" y="468" fill="#10b981" font-size="9" font-weight="extrabold" class="dark:fill-emerald-400" text-anchor="middle">Praia Grande (CLS)</text>
+                    </g>
+
+                    <!-- 5. São Paulo (Main Traffic Hub) -->
+                    <g onclick="selectMapNode('sp')" class="cursor-pointer group">
+                        <circle cx="360" cy="440" r="16" fill="rgba(99, 102, 241, 0.2)" class="map-pulse"/>
+                        <circle cx="360" cy="440" r="8" fill="#6366f1" stroke="#fff" stroke-width="2" class="group-hover:fill-indigo-400 transition-all"/>
+                        <text x="345" y="440" fill="#6366f1" font-size="10" font-weight="black" class="dark:fill-indigo-400" text-anchor="end">SÃO PAULO (HUB)</text>
+                    </g>
+
+                    <!-- 6. Brasília (Central Hub) -->
+                    <g onclick="selectMapNode('bsb')" class="cursor-pointer group">
+                        <circle cx="350" cy="340" r="14" fill="rgba(139, 92, 246, 0.2)" class="map-pulse"/>
+                        <circle cx="350" cy="340" r="6" fill="#8b5cf6" stroke="#fff" stroke-width="1.5" class="group-hover:fill-violet-400 transition-all"/>
+                        <text x="340" y="335" fill="#8b5cf6" font-size="9" font-weight="extrabold" class="dark:fill-violet-400" text-anchor="end">Brasília</text>
+                    </g>
+
+                    <!-- 7. Manaus (Regional Hub / Amazon) -->
+                    <g onclick="selectMapNode('manaus')" class="cursor-pointer group">
+                        <circle cx="170" cy="230" r="12" fill="rgba(245, 158, 11, 0.2)" class="map-pulse"/>
+                        <circle cx="170" cy="230" r="6" fill="#f59e0b" stroke="#fff" stroke-width="1.5" class="group-hover:fill-amber-400 transition-all"/>
+                        <text x="170" y="220" fill="#f59e0b" font-size="9" font-weight="extrabold" class="dark:fill-amber-400" text-anchor="middle">Manaus (Subfluvial)</text>
+                    </g>
+
+                    <!-- 8. Porto Alegre (South Hub) -->
+                    <g onclick="selectMapNode('poa')" class="cursor-pointer group">
+                        <circle cx="280" cy="560" r="12" fill="rgba(139, 92, 246, 0.2)" class="map-pulse"/>
+                        <circle cx="280" cy="560" r="6" fill="#8b5cf6" stroke="#fff" stroke-width="1.5" class="group-hover:fill-violet-400 transition-all"/>
+                        <text x="290" y="564" fill="#8b5cf6" font-size="9" font-weight="extrabold" class="dark:fill-violet-400">Porto Alegre</text>
+                    </g>
+                </svg>
+
+                <div class="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-900/90 px-3 py-2 rounded-xl text-[9px] border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 block"></span>
+                        <span class="text-slate-500 dark:text-slate-400">Landing Station (CLS)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 block"></span>
+                        <span class="text-slate-500 dark:text-slate-400">Ponto de Troca de Tráfego (IXP)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-0.5 bg-indigo-400 block"></span>
+                        <span class="text-slate-500 dark:text-slate-400">Fibras Terrestres (Backbones)</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Final Flow: From Submarine Cable to User's House -->
+        <section class="mb-12">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h3 class="font-extrabold text-2xl text-slate-800 dark:text-slate-100">O Fluxo Completo da Internet</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Como uma pesquisa no Google viaja do servidor internacional até a sua tela em milissegundos.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-sm">
+                    <span class="text-xs font-black text-brand-500">PASSO 01</span>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm">Oceano</h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        A requisição viaja por cabos de fibra óptica depositados no fundo do mar a velocidades próximas à velocidade da luz.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-sm">
+                    <span class="text-xs font-black text-brand-500">PASSO 02</span>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm">Ancoragem (CLS)</h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        A luz emerge do mar e entra nas Cable Landing Stations no litoral (como Fortaleza), sendo amplificada por lasers potentes.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-sm">
+                    <span class="text-xs font-black text-brand-500">PASSO 03</span>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm">Rodovias Terrestres</h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        O sinal cruza o país via rodovias e linhas de transmissão elétrica de fibra (Backbones) até chegar aos grandes Data Centers estaduais.
+                    </p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="glass-card p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-sm">
+                    <span class="text-xs font-black text-brand-500">PASSO 04</span>
+                    <h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm">Última Milha (FTTH)</h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        O sinal é dividido para o seu provedor regional, passa pelos postes da sua rua e entra na sua casa direto no seu roteador.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Map and Sandbox Logic Scripts -->
+    <script>
+        // Refraction Sandbox Interactive Logic
+        const slider = document.getElementById('angle-slider');
+        const angleValueText = document.getElementById('angle-value');
+        const feedbackBox = document.getElementById('sandbox-feedback');
+        const laserBeam = document.getElementById('laser-beam');
+
+        function updateSandbox() {
+            const angle = parseInt(slider.value);
+            angleValueText.textContent = `${angle}°`;
+
+            // Calculate SVG coordinates of bounces inside core
+            // Core box is: x: 50, y: 60, width: 400, height: 80 (center y is 100)
+            const startX = 45;
+            const startY = 100;
+            const limitX = 450;
+            const coreTop = 60;
+            const coreBottom = 140;
+
+            // Simple ray tracing simulation inside box
+            // The angle defines the slope. dy/dx = tan(angle)
+            const radians = (angle * Math.PI) / 180;
+            const dy = Math.sin(radians) * 45; // step size
+            const dx = Math.cos(radians) * 45; 
+
+            // Calculate bounces
+            let points = [[startX, startY]];
+            let currentX = startX;
+            let currentY = startY;
+            let directionY = 1; // 1 = down, -1 = up
+            
+            // Acceptance angle threshold: GPON/Optical standard fiber has a numerical aperture 
+            // where typical acceptance angle is around ~15° to ~20° inside glass.
+            // Let's set 25° as the cutoff for visual feedback.
+            const isTotalReflection = angle <= 22;
+
+            if (isTotalReflection) {
+                // Bounce along the core
+                while (currentX < limitX) {
+                    let nextX = currentX + dx;
+                    let nextY = currentY + (directionY * dy);
+                    
+                    if (nextY >= coreBottom) {
+                        // Reflect on bottom
+                        const diffY = nextY - coreBottom;
+                        nextY = coreBottom - diffY;
+                        directionY = -1;
+                    } else if (nextY <= coreTop) {
+                        // Reflect on top
+                        const diffY = coreTop - nextY;
+                        nextY = coreTop + diffY;
+                        directionY = 1;
+                    }
+                    
+                    // Cap at limits
+                    if (nextX > limitX) {
+                        const ratio = (limitX - currentX) / (nextX - currentX);
+                        nextY = currentY + (nextY - currentY) * ratio;
+                        nextX = limitX;
+                    }
+                    
+                    points.push([nextX, nextY]);
+                    currentX = nextX;
+                    currentY = nextY;
+                }
+                
+                // Draw path
+                let pathD = `M ${points[0][0]} ${points[0][1]} ` + points.slice(1).map(p => `L ${p[0]} ${p[1]}`).join(' ');
+                laserBeam.setAttribute('d', pathD);
+                laserBeam.setAttribute('stroke', '#10b981'); // Green laser for success
+                laserBeam.setAttribute('class', 'drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]');
+
+                feedbackBox.className = "p-3.5 rounded-xl text-xs font-semibold mt-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20";
+                feedbackBox.innerHTML = `<strong>✅ Reflexão Interna Total!</strong> A luz bate nas divisórias de vidro e permanece presa dentro do núcleo da fibra. A informação viaja com perda mínima.`;
+            } else {
+                // Escape! The angle is too steep, light refracts OUT of the core
+                // First bounce will escape.
+                let nextX = currentX + dx * 1.5;
+                let nextY = currentY + dy * 1.5; // goes straight out of limits
+                
+                // Draw escaping ray
+                let pathD = `M ${startX} ${startY} L ${nextX} ${nextY}`;
+                laserBeam.setAttribute('d', pathD);
+                laserBeam.setAttribute('stroke', '#ef4444'); // Red laser for failure
+                laserBeam.setAttribute('class', 'drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+
+                feedbackBox.className = "p-3.5 rounded-xl text-xs font-semibold mt-3 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20";
+                feedbackBox.innerHTML = `<strong>❌ Fuga de Luz (Refração)!</strong> O ângulo é inclinado demais (${angle}°). A luz atravessa a casca protetora e escapa para fora do cabo. Não há transmissão de internet.`;
+            }
+        }
+
+        slider.addEventListener('input', updateSandbox);
+        updateSandbox();
+
+        // Brazil Map Interactivity Logic
+        const mapData = {
+            fortaleza: {
+                title: "Fortaleza (Ceará) - Estação CLS",
+                desc: "Considerada a capital da internet na América Latina. Devido à sua posição geográfica privilegiada na 'esquina' do Brasil, é o local onde ancoram mais de 16 cabos submarinos transcontinentais vindos diretamente de Miami (EUA), Lisboa (Portugal) e Camarões (África). Daqui, a luz emerge e é direcionada para o resto do país.",
+                capacity: "Capacidade de mais de 100 Tbps",
+                type: "Cable Landing Station (Estação Marítima)"
+            },
+            salvador: {
+                title: "Salvador (Bahia) - Estação CLS",
+                desc: "Ponto estratégico de redundância e ancoragem no Nordeste brasileiro. Conecta cabos submarinos que passam pela costa e distribui o sinal terrestre por toda a região do recôncavo baiano e interior do Nordeste.",
+                capacity: "Redundância de alta performance",
+                type: "Cable Landing Station (Estação Marítima)"
+            },
+            rio: {
+                title: "Rio de Janeiro (RJ) - Estação CLS",
+                desc: "Ancora múltiplos cabos submarinos cruciais de tráfego secundário e internacional (como os cabos MONET e Tannat). É um dos pilares do tráfego corporativo e conecta-se diretamente com os maiores centros de telecom da região metropolitana.",
+                capacity: "Pilar corporativo do Sudeste",
+                type: "Cable Landing Station (Estação Marítima)"
+            },
+            santos: {
+                title: "Praia Grande / Santos (SP) - Estação CLS",
+                desc: "Uma das portas de chegada mais movimentadas do Sudeste. Os cabos de fibra entram pela praia de Praia Grande e sobem a Serra do Mar protegidos em calhas subterrâneas para abastecer o gigantesco centro urbano de São Paulo e arredores.",
+                capacity: "Abastecimento principal do Sudeste",
+                type: "Cable Landing Station (Estação Marítima)"
+            },
+            sp: {
+                title: "São Paulo (SP) - O Coração dos Dados",
+                desc: "O maior Ponto de Troca de Tráfego (PTT / IX.br) do Hemisfério Sul. Aqui, gigantes da tecnologia (Google, Netflix, Microsoft) instalam seus servidores de conteúdo (CDNs). A internet que chega do mar se divide em milhares de provedores menores, garantindo que o conteúdo esteja fisicamente próximo aos milhões de usuários finais.",
+                capacity: "Tráfego médio de 20+ Tbps locais",
+                type: "Ponto de Troca de Tráfego (IXP) / Data Centers"
+            },
+            bsb: {
+                title: "Brasília (DF) - O Hub de Distribuição Central",
+                desc: "Funciona como o núcleo geográfico que interliga o tráfego óptico do Norte, Centro-Oeste e Sudeste do Brasil. Grandes rotas terrestres de fibra (Backbones) estendem-se de Brasília em direção ao interior do país para garantir que o sinal chegue a cidades afastadas do litoral.",
+                capacity: "Conector Geográfico Nacional",
+                type: "Gargalo e Distribuição de Backbone"
+            },
+            manaus: {
+                title: "Manaus (Amazonas) - Fibra Subfluvial",
+                desc: "Um dos maiores desafios de engenharia do mundo. Como a selva amazônica impede a instalação de postes convencionais, os cabos de fibra óptica são <strong>lançados nos leitos dos rios</strong> (como o Rio Amazonas e Solimões) ou fixados em torres aéreas de energia para levar internet de alta velocidade ao coração da Amazônia.",
+                capacity: "Desafio de Conectividade da Selva",
+                type: "Infovias Ópticas Subfluviais"
+            },
+            poa: {
+                title: "Porto Alegre (RS) - Hub do Mercosul",
+                desc: "Ponto de conexão e tráfego terrestre que liga a malha de fibra óptica brasileira aos países vizinhos da América do Sul, como Uruguai e Argentina. Garante que os dados internacionais transitem rapidamente sem a necessidade de retornar por cabos de mar mais longos.",
+                capacity: "Integração Terrestre Sul-Americana",
+                type: "Ponto de Fronteira e Trânsito Terrestre"
+            }
+        };
+
+        const mapInfoTitle = document.getElementById('map-info-title');
+        const mapInfoDesc = document.getElementById('map-info-desc');
+        const mapInfoStats = document.getElementById('map-info-stats');
+        const mapInfoCard = document.getElementById('map-info-card');
+
+        function selectMapNode(key) {
+            const data = mapData[key];
+            if (!data) return;
+
+            // Trigger quick animation scale
+            mapInfoCard.style.transform = 'scale(0.98)';
+            mapInfoCard.style.opacity = '0.7';
+
+            setTimeout(() => {
+                mapInfoTitle.textContent = data.title;
+                mapInfoDesc.innerHTML = `${data.desc}`;
+                mapInfoStats.innerHTML = `
+                    <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500 text-[9px]">${data.type}</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px]">${data.capacity}</span>
+                `;
+                mapInfoCard.style.transform = 'scale(1)';
+                mapInfoCard.style.opacity = '1';
+            }, 100);
+        }
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+        }
+
+        function updateThemeIcons(isDark) {
+            const moonIcon = document.getElementById('moon-icon');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIconMob = document.getElementById('moon-icon-mobile');
+            const sunIconMob = document.getElementById('sun-icon-mobile');
+
+            if (isDark) {
+                moonIcon?.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIconMob?.classList.add('hidden');
+                sunIconMob?.classList.remove('hidden');
+            } else {
+                moonIcon?.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIconMob?.classList.remove('hidden');
+                sunIconMob?.classList.add('hidden');
+            }
+        }
+
+        // Mob menu toggling
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuToggle?.addEventListener('click', () => {
+            mobileMenu?.classList.remove('hidden');
+        });
+
+        menuClose?.addEventListener('click', () => {
+            mobileMenu?.classList.add('hidden');
+        });
+
+        mobileMenu?.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu?.classList.add('hidden');
+            }
+        });
+
+        // Initialize theme state on load
+        const initTheme = document.documentElement.classList.contains('dark');
+        updateThemeIcons(initTheme);
+    </script>
+</body>
+</html>
